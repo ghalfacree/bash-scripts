@@ -9,6 +9,6 @@ read -p "Enter 'y' to continue, or any other key to quit. "
 echo Correcting GPS Date tag, please wait...
 for i in *.jpg
 do
-  exiftool -GPSDateStamp=`exiftool -exif:DateTimeOriginal "$i" | cut -d" " -f17` "$i"
+  exiftool -m -GPSDateStamp=`exiftool -exif:DateTimeOriginal "$i" | cut -d" " -f17` "$i"
 done
 echo Correction complete.
