@@ -10,6 +10,9 @@ echo Correcting GPS Date tag, please wait...
 for i in *.jpg
 do
   exiftool -m -GPSDateStamp=`exiftool -exif:DateTimeOriginal "$i" | cut -d" " -f17` "$i"
-  rm "$i"_original
+  if [ -f "$i"_original ]
+  then
+    rm "$i"_original
+  fi
 done
 echo Correction complete.
