@@ -1,0 +1,3 @@
+#!/bin/bash
+echo Backing up images from Galaxy SII...
+rsync -av --progress /media/blacklaw/DroidCard/DCIM/ /media/Data/Photos/Galaxy\ S\ II/DCIM/
