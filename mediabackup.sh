@@ -1,3 +1,8 @@
 #!/bin/bash
-rsync -av --progress /media/Data/Photos/ blacklaw.homedns.org:/media/Seagate320/Photos/
-rsync -av --progress /media/Data/My\ Music/ blacklaw.homedns.org:/media/Seagate320/Music/
+echo Updating local Nexus 4 image archive...
+rsync -e "ssh -c arcfour" -av --progress blacklaw.homedns.org:/media/Seagate320/NexusBackup/DCIM/ /media/Data/Photos/Nexus\ 4/DCIM/
+echo Synchronising remote photo archive...
+rsync -e "ssh -c arcfour" -av --delete --progress /media/Data/Photos/ blacklaw.homedns.org:/media/Seagate320/Photos/
+echo Synchronising remote music archive...
+rsync -e "ssh -c arcfour" -av --delete --progress /media/Data/My\ Music/ blacklaw.homedns.org:/media/Seagate320/Music/
+echo Backup complete.
