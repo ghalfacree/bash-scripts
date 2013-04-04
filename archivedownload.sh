@@ -15,7 +15,7 @@ if [ "`cat processedidentifiers.txt | wc -l`" = "0" ]; then
   exit
 fi
 echo Beginning wget download of `cat processedidentifiers.txt | wc -l` identifiers...
-wget -r -H -nc -np -nH -nd -A .pdf -e robots=off -i processedidentifiers.txt -D archive.org --exclude-domains blog.archive.org --exclude-domains web.archive.org -B 'http://www.archive.org/download/'
+wget -r -H -nc -np -nH -nd -e robots=off -i processedidentifiers.txt -B 'http://archive.org/download/' -A .pdf
 if ls -U *_text.pdf > /dev/null 2>&1; then
   echo Found text-format PDFs, moving into text/ directory...
   if [ -d text ]; then
