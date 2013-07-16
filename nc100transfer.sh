@@ -8,5 +8,5 @@ fi
 echo Saving $1...
 rx $1 < /dev/ttyWCH0 > /dev/ttyWCH0
 echo Removing control characters from $1...
-sed -i s/[[:cntrl:]]//g $1
+sed -i 's/[[:cntrl:]]//g;s/\o234/£/g' $1
 echo File $1 transferred successfully.
