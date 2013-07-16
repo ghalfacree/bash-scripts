@@ -35,4 +35,5 @@ case "$1" in
     echo $"USAGE: $0 {rx|tx} filename"
     exit 1
     ;;
+
 esac  
