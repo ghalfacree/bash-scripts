@@ -23,7 +23,6 @@ case "$1" in
     cp $2 /tmp/nc100.temp
     echo Converting codepage, mapping £ symbol...
     sed -i 's/£/symbolforGBPgohere/g' /tmp/nc100.temp
-    echo Converting $2 to 7-bit ASCII...
     iconv -f UTF-8 -t ASCII//TRANSLIT -o /tmp/nc100.ascii /tmp/nc100.temp
     sed -i 's/symbolforGBPgohere/\o234/g' /tmp/nc100.ascii
     sx /tmp/nc100.ascii > /dev/ttyWCH0 < /dev/ttyWCH0
@@ -35,4 +34,5 @@ case "$1" in
   *)
     echo $"USAGE: $0 {rx|tx} filename"
     exit 1
+    ;;
 esac  
