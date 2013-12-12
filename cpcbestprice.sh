@@ -31,8 +31,8 @@ if [ "$bestprice" == "" ]; then
 		exit 1
 	fi
 fi
-echo Base price for product $baseproductcode is £$bestprice.
-winningcode=$baseproductcode
+echo Base price for product $i is £$bestprice.
+winningcode=$(echo $i at £$bestprice.)
 
 for i in {0..9}; do
 	searchsuffix="0$i"
@@ -43,8 +43,8 @@ for i in {0..9}; do
 		bestpricepence=$(echo $bestprice | sed 's/\.//g')
 		if [ $currentpricepence -lt $bestpricepence ]; then
 			printf " It's cheaper at £$currentprice!\n"
-			winningcode=$(echo $baseproductcode\0$i at £$currentprice.)
 			bestprice=$currentprice
+			winningcode=$(echo $baseproductcode\0$i at £$bestprice.)
 		fi
 	fi
 done
@@ -57,8 +57,8 @@ for i in {10..99}; do
 		bestpricepence=$(echo $bestprice | sed 's/\.//g')
 		if [ $currentpricepence -lt $bestpricepence ]; then
 			printf " It's cheaper at £$currentprice!\n"
-			winningcode=$(echo $baseproductcode$i at £$currentprice.)
 			bestprice=$currentprice
+			winningcode=$(echo $baseproductcode$i at £$bestprice.)
 		fi
 	fi
 done
