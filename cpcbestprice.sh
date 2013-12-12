@@ -25,37 +25,45 @@ baseproductcode=$(echo $1 | cut -c 1-7)
 
 bestprice=$(wget -q -O - "http://cpc.farnell.com/jsp/search/productdetail.jsp?_dyncharset=UTF-8&searchTerms=$1&_D%3AsearchTerms=+&%2Fpf%2Fsearch%2FTextSearchFormHandler.search=GO&_D%3A%2Fpf%2Fsearch%2FTextSearchFormHandler.search=+&s=&%2Fpf%2Fsearch%2FTextSearchFormHandler.suggestions=false&_D%3A%2Fpf%2Fsearch%2FTextSearchFormHandler.suggestions=+&%2Fpf%2Fsearch%2FTextSearchFormHandler.ref=globalsearch&_D%3A%2Fpf%2Fsearch%2FTextSearchFormHandler.ref=+&_D%3A%2Fpf%2Fsearch%2FTextSearchFormHandler.onlyInStockProducts=+&%2Fpf%2Fsearch%2FTextSearchFormHandler.onlyInStockProductsActive=true&_D%3A%2Fpf%2Fsearch%2FTextSearchFormHandler.onlyInStockProductsActive=+&_DARGS=%2Fjsp%2Fcommonfragments%2FglobalsearchE14.jsp" | grep taxedvalue -m 1 | cut -d" " -f1 | sed 's/£//g')
 if [ "$bestprice" == "" ]; then
-	bestprice=$(wget -q -O - "http://cpc.farnell.com/jsp/search/productdetail.jsp?_dyncharset=UTF-8&searchTerms=$1\01&_D%3AsearchTerms=+&%2Fpf%2Fsearch%2FTextSearchFormHandler.search=GO&_D%3A%2Fpf%2Fsearch%2FTextSearchFormHandler.search=+&s=&%2Fpf%2Fsearch%2FTextSearchFormHandler.suggestions=false&_D%3A%2Fpf%2Fsearch%2FTextSearchFormHandler.suggestions=+&%2Fpf%2Fsearch%2FTextSearchFormHandler.ref=globalsearch&_D%3A%2Fpf%2Fsearch%2FTextSearchFormHandler.ref=+&_D%3A%2Fpf%2Fsearch%2FTextSearchFormHandler.onlyInStockProducts=+&%2Fpf%2Fsearch%2FTextSearchFormHandler.onlyInStockProductsActive=true&_D%3A%2Fpf%2Fsearch%2FTextSearchFormHandler.onlyInStockProductsActive=+&_DARGS=%2Fjsp%2Fcommonfragments%2FglobalsearchE14.jsp" | grep taxedvalue -m 1 | cut -d" " -f1 | sed 's/£//g')
+	bestprice=$(wget -q -O - "http://cpc.farnell.com/jsp/search/productdetail.jsp?_dyncharset=UTF-8&searchTerms=$baseproductcode\01&_D%3AsearchTerms=+&%2Fpf%2Fsearch%2FTextSearchFormHandler.search=GO&_D%3A%2Fpf%2Fsearch%2FTextSearchFormHandler.search=+&s=&%2Fpf%2Fsearch%2FTextSearchFormHandler.suggestions=false&_D%3A%2Fpf%2Fsearch%2FTextSearchFormHandler.suggestions=+&%2Fpf%2Fsearch%2FTextSearchFormHandler.ref=globalsearch&_D%3A%2Fpf%2Fsearch%2FTextSearchFormHandler.ref=+&_D%3A%2Fpf%2Fsearch%2FTextSearchFormHandler.onlyInStockProducts=+&%2Fpf%2Fsearch%2FTextSearchFormHandler.onlyInStockProductsActive=true&_D%3A%2Fpf%2Fsearch%2FTextSearchFormHandler.onlyInStockProductsActive=+&_DARGS=%2Fjsp%2Fcommonfragments%2FglobalsearchE14.jsp" | grep taxedvalue -m 1 | cut -d" " -f1 | sed 's/£//g')
 	if [ "$bestprice" == "" ]; then
 		echo Product $1 not found.
 		exit 1
 	fi
 fi
 echo Base price for product $baseproductcode is £$bestprice.
+winningcode=$baseproductcode
 
 for i in {0..9}; do
 	searchsuffix="0$i"
+	printf "\rTesting product code $baseproductcode$searchsuffix..."
 	currentprice=$(wget -q -O - "http://cpc.farnell.com/jsp/search/productdetail.jsp?_dyncharset=UTF-8&searchTerms=$baseproductcode$searchsuffix&_D%3AsearchTerms=+&%2Fpf%2Fsearch%2FTextSearchFormHandler.search=GO&_D%3A%2Fpf%2Fsearch%2FTextSearchFormHandler.search=+&s=&%2Fpf%2Fsearch%2FTextSearchFormHandler.suggestions=false&_D%3A%2Fpf%2Fsearch%2FTextSearchFormHandler.suggestions=+&%2Fpf%2Fsearch%2FTextSearchFormHandler.ref=globalsearch&_D%3A%2Fpf%2Fsearch%2FTextSearchFormHandler.ref=+&_D%3A%2Fpf%2Fsearch%2FTextSearchFormHandler.onlyInStockProducts=+&%2Fpf%2Fsearch%2FTextSearchFormHandler.onlyInStockProductsActive=true&_D%3A%2Fpf%2Fsearch%2FTextSearchFormHandler.onlyInStockProductsActive=+&_DARGS=%2Fjsp%2Fcommonfragments%2FglobalsearchE14.jsp" | grep taxedvalue -m 1 | cut -d" " -f1 | sed 's/£//g')
 	if [ "$currentprice" != "" ]; then
 		currentpricepence=$(echo $currentprice | sed 's/\.//g')
 		bestpricepence=$(echo $bestprice | sed 's/\.//g')
 		if [ $currentpricepence -lt $bestpricepence ]; then
-			echo Best price so far: $baseproductcode\0$i at £$currentprice.
+			printf " It's cheaper at £$currentprice!\n"
+			winningcode=$(echo $baseproductcode\0$i at £$currentprice.)
 			bestprice=$currentprice
 		fi
 	fi
 done
 
 for i in {10..99}; do
+	printf "\rTesting product code $baseproductcode$i..."
 	currentprice=$(wget -q -O - "http://cpc.farnell.com/jsp/search/productdetail.jsp?_dyncharset=UTF-8&searchTerms=$baseproductcode$i&_D%3AsearchTerms=+&%2Fpf%2Fsearch%2FTextSearchFormHandler.search=GO&_D%3A%2Fpf%2Fsearch%2FTextSearchFormHandler.search=+&s=&%2Fpf%2Fsearch%2FTextSearchFormHandler.suggestions=false&_D%3A%2Fpf%2Fsearch%2FTextSearchFormHandler.suggestions=+&%2Fpf%2Fsearch%2FTextSearchFormHandler.ref=globalsearch&_D%3A%2Fpf%2Fsearch%2FTextSearchFormHandler.ref=+&_D%3A%2Fpf%2Fsearch%2FTextSearchFormHandler.onlyInStockProducts=+&%2Fpf%2Fsearch%2FTextSearchFormHandler.onlyInStockProductsActive=true&_D%3A%2Fpf%2Fsearch%2FTextSearchFormHandler.onlyInStockProductsActive=+&_DARGS=%2Fjsp%2Fcommonfragments%2FglobalsearchE14.jsp" | grep taxedvalue -m 1 | cut -d" " -f1 | sed 's/£//g')
 	if [ "$currentprice" != "" ]; then
 		currentpricepence=$(echo $currentprice | sed 's/\.//g')
 		bestpricepence=$(echo $bestprice | sed 's/\.//g')
 		if [ $currentpricepence -lt $bestpricepence ]; then
-			echo Best price so far: $baseproductcode$i at £$currentprice.
+			printf " It's cheaper at £$currentprice!\n"
+			winningcode=$(echo $baseproductcode$i at £$currentprice.)
 			bestprice=$currentprice
 		fi
 	fi
 done
-
+printf "\n"
 echo Search complete!
+printf "\n"
+echo The cheapest product code found is $winningcode
+exit 0
