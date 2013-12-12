@@ -80,7 +80,7 @@ if [ "${savingspence:-0}" -gt 0 ]; then
 		if [ "$savingspence" -eq 0 ]; then
 			exit 0
 		fi
-		echo Using this code will save you $savingsremainder\p.
+		echo Using this code will save you $savingsremainder\p per unit.
 		exit 0
 	fi
 	echo Using this code will save you £$savingspounds.$savingsremainder per unit.
