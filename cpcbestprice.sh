@@ -31,8 +31,8 @@ if [ "$bestprice" == "" ]; then
 		exit 1
 	fi
 fi
-echo Base price for product $i is £$bestprice.
-winningcode=$(echo $i at £$bestprice.)
+echo Base price for product $1 is £$bestprice.
+winningcode=$(echo $1 at £$bestprice.)
 
 for i in {0..9}; do
 	searchsuffix="0$i"
