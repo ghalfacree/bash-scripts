@@ -19,7 +19,7 @@ if [ "$1" == "" ]; then
 	exit 1
 fi
 
-echo Finding best price for CPC Product Code $1...
+printf "Finding standard price for product code $1..."
 
 baseproductcode=$(echo $1 | cut -c 1-7)
 
@@ -27,11 +27,11 @@ bestprice=$(wget -q -O - "http://cpc.farnell.com/jsp/search/productdetail.jsp?_d
 if [ "$bestprice" == "" ]; then
 	bestprice=$(wget -q -O - "http://cpc.farnell.com/jsp/search/productdetail.jsp?_dyncharset=UTF-8&searchTerms=$baseproductcode\01&_D%3AsearchTerms=+&%2Fpf%2Fsearch%2FTextSearchFormHandler.search=GO&_D%3A%2Fpf%2Fsearch%2FTextSearchFormHandler.search=+&s=&%2Fpf%2Fsearch%2FTextSearchFormHandler.suggestions=false&_D%3A%2Fpf%2Fsearch%2FTextSearchFormHandler.suggestions=+&%2Fpf%2Fsearch%2FTextSearchFormHandler.ref=globalsearch&_D%3A%2Fpf%2Fsearch%2FTextSearchFormHandler.ref=+&_D%3A%2Fpf%2Fsearch%2FTextSearchFormHandler.onlyInStockProducts=+&%2Fpf%2Fsearch%2FTextSearchFormHandler.onlyInStockProductsActive=true&_D%3A%2Fpf%2Fsearch%2FTextSearchFormHandler.onlyInStockProductsActive=+&_DARGS=%2Fjsp%2Fcommonfragments%2FglobalsearchE14.jsp" | grep taxedvalue -m 1 | cut -d" " -f1 | sed 's/£//g')
 	if [ "$bestprice" == "" ]; then
-		echo Product $1 not found.
+		printf " Product $1 not found."
 		exit 1
 	fi
 fi
-echo Base price for product $1 is £$bestprice.
+printf " £$bestprice found.\n"
 winningcode=$(echo $1 at £$bestprice.)
 
 for i in {0..9}; do
@@ -62,8 +62,6 @@ for i in {10..99}; do
 		fi
 	fi
 done
-printf "\n"
-echo Search complete!
-printf "\n"
+printf "\rSearch complete!                  \n\n"
 echo The cheapest product code found is $winningcode
 exit 0
