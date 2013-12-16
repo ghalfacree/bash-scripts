@@ -14,16 +14,20 @@
 # Yes, that means 101 searches on CPC's website. Like I said, it's a horribly
 # nasty hacky script.
 
-if [ "$1" == "" ]; then
-	echo USAGE: $0 productcode
+productcode=$(echo $1 | grep '^[A-Za-z][A-Za-z][0-9].*[0-9]')
+
+if [ "$productcode" == "" ]; then
+	echo USAGE: $0 PRODUCTCODE
+	echo Product codes are two letters, then seven or nine numbers.
+	echo Any other format will be rejected.
 	exit 1
 fi
 
-printf "Finding standard price for product code $1..."
+printf "Finding standard price for product code $productcode..."
 
-baseproductcode=$(echo $1 | cut -c 1-7)
+baseproductcode=$(echo $productcode | cut -c 1-7)
 
-bestprice=$(wget -q -O - "http://cpc.farnell.com/jsp/search/productdetail.jsp?_dyncharset=UTF-8&searchTerms=$1&_D%3AsearchTerms=+&%2Fpf%2Fsearch%2FTextSearchFormHandler.search=GO&_D%3A%2Fpf%2Fsearch%2FTextSearchFormHandler.search=+&s=&%2Fpf%2Fsearch%2FTextSearchFormHandler.suggestions=false&_D%3A%2Fpf%2Fsearch%2FTextSearchFormHandler.suggestions=+&%2Fpf%2Fsearch%2FTextSearchFormHandler.ref=globalsearch&_D%3A%2Fpf%2Fsearch%2FTextSearchFormHandler.ref=+&_D%3A%2Fpf%2Fsearch%2FTextSearchFormHandler.onlyInStockProducts=+&%2Fpf%2Fsearch%2FTextSearchFormHandler.onlyInStockProductsActive=true&_D%3A%2Fpf%2Fsearch%2FTextSearchFormHandler.onlyInStockProductsActive=+&_DARGS=%2Fjsp%2Fcommonfragments%2FglobalsearchE14.jsp" | grep taxedvalue -m 1 | cut -d" " -f1 | sed 's/£//g')
+bestprice=$(wget -q -O - "http://cpc.farnell.com/jsp/search/productdetail.jsp?_dyncharset=UTF-8&searchTerms=$productcode&_D%3AsearchTerms=+&%2Fpf%2Fsearch%2FTextSearchFormHandler.search=GO&_D%3A%2Fpf%2Fsearch%2FTextSearchFormHandler.search=+&s=&%2Fpf%2Fsearch%2FTextSearchFormHandler.suggestions=false&_D%3A%2Fpf%2Fsearch%2FTextSearchFormHandler.suggestions=+&%2Fpf%2Fsearch%2FTextSearchFormHandler.ref=globalsearch&_D%3A%2Fpf%2Fsearch%2FTextSearchFormHandler.ref=+&_D%3A%2Fpf%2Fsearch%2FTextSearchFormHandler.onlyInStockProducts=+&%2Fpf%2Fsearch%2FTextSearchFormHandler.onlyInStockProductsActive=true&_D%3A%2Fpf%2Fsearch%2FTextSearchFormHandler.onlyInStockProductsActive=+&_DARGS=%2Fjsp%2Fcommonfragments%2FglobalsearchE14.jsp" | grep taxedvalue -m 1 | cut -d" " -f1 | sed 's/£//g')
 if [ "$bestprice" == "" ] || [ "$bestprice" == "<span" ]; then
 	for i in {01..10}; do
 		bestprice=$(wget -q -O - "http://cpc.farnell.com/jsp/search/productdetail.jsp?_dyncharset=UTF-8&searchTerms=$baseproductcode$i&_D%3AsearchTerms=+&%2Fpf%2Fsearch%2FTextSearchFormHandler.search=GO&_D%3A%2Fpf%2Fsearch%2FTextSearchFormHandler.search=+&s=&%2Fpf%2Fsearch%2FTextSearchFormHandler.suggestions=false&_D%3A%2Fpf%2Fsearch%2FTextSearchFormHandler.suggestions=+&%2Fpf%2Fsearch%2FTextSearchFormHandler.ref=globalsearch&_D%3A%2Fpf%2Fsearch%2FTextSearchFormHandler.ref=+&_D%3A%2Fpf%2Fsearch%2FTextSearchFormHandler.onlyInStockProducts=+&%2Fpf%2Fsearch%2FTextSearchFormHandler.onlyInStockProductsActive=true&_D%3A%2Fpf%2Fsearch%2FTextSearchFormHandler.onlyInStockProductsActive=+&_DARGS=%2Fjsp%2Fcommonfragments%2FglobalsearchE14.jsp" | grep taxedvalue -m 1 | cut -d" " -f1 | sed 's/£//g')
@@ -33,15 +37,15 @@ if [ "$bestprice" == "" ] || [ "$bestprice" == "<span" ]; then
 	done
 fi
 if [ "$bestprice" == "" ]; then
-	printf " Product $1 not found.\n"
+	printf " Error.\nProduct $productcode not found.\n"
 	exit 1
 fi
 if [ "$bestprice" == "<span" ]; then
-	printf "\nProduct $1 not found as currently-stocked item.\n"
+	printf " Error.\nProduct $productcode not found as currently-stocked item.\n"
 	exit 1
 fi
 printf " £$bestprice found.\n"
-winningcode=$(echo $1 at £$bestprice.)
+winningcode=$(echo $productcode at £$bestprice.)
 originalpricepence=$(echo $bestprice | sed -e 's/\.//g' -e 's/^0*//')
 
 for i in {00..99}; do
