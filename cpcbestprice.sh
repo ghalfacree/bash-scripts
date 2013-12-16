@@ -30,6 +30,10 @@ if [ "$bestprice" == "" ] || [ "$bestprice" == "<span" ]; then
 		printf "\nProduct $1 not found.\n"
 		exit 1
 	fi
+	if [ "$bestprice" == "<span" ]; then
+		printf "\nProduct $1 is no longer a stock item.\n"
+		exit 1
+	fi
 fi
 printf " £$bestprice found.\n"
 winningcode=$(echo $1 at £$bestprice.)
