@@ -78,8 +78,10 @@ if [ "${savingspence:-0}" -gt 0 ]; then
 			exit 0
 		fi
 		echo Using this code will save you $savingsremainder\p per unit.
+		echo Direct link: http://cpc.farnell.com/${winningcode:0:9}
 		exit 0
 	fi
 	echo Using this code will save you £$savingspounds.$savingsremainder per unit.
+	echo Direct link: http://cpc.farnell.com/${winningcode:0:9}
 fi
 exit 0
