@@ -62,6 +62,7 @@ done
 
 printf "\rSearch complete!                  \n\n"
 echo The cheapest product code found is $winningcode
+echo Direct link: http://cpc.farnell.com/${winningcode:0:9}
 bestpricepence=$(echo $bestprice | sed -e 's/\.//' -e 's/^0*//')
 savingspence=$(($originalpricepence - $bestpricepence))
 if [ "${savingspence:-0}" -gt 0 ]; then
@@ -78,10 +79,8 @@ if [ "${savingspence:-0}" -gt 0 ]; then
 			exit 0
 		fi
 		echo Using this code will save you $savingsremainder\p per unit.
-		echo Direct link: http://cpc.farnell.com/${winningcode:0:9}
 		exit 0
 	fi
 	echo Using this code will save you £$savingspounds.$savingsremainder per unit.
-	echo Direct link: http://cpc.farnell.com/${winningcode:0:9}
 fi
 exit 0
