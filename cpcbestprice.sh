@@ -25,10 +25,10 @@ fi
 
 printf "Finding standard price for product code $productcode..."
 
-bestprice=$(wget -q -4 --no-dns-cache -O - "http://cpc.farnell.com/$productcode" | grep taxedvalue -m 1 | cut -d" " -f1 | sed 's/£//g')
+bestprice=$(wget -q -4 --no-dns-cache -O - "http://cpc.farnell.com/$productcode" | grep taxedvalue -m 1 | cut -d" " -f1 | sed 's/£//')
 if [ "$bestprice" == "" ] || [ "$bestprice" == "<span" ]; then
 	for i in {01..10}; do
-		bestprice=$(wget -q -4 --no-dns-cache -O - "http://cpc.farnell.com/${productcode:0:7}$i" | grep taxedvalue -m 1 | cut -d" " -f1 | sed 's/£//g')
+		bestprice=$(wget -q -4 --no-dns-cache -O - "http://cpc.farnell.com/${productcode:0:7}$i" | grep taxedvalue -m 1 | cut -d" " -f1 | sed 's/£//')
 		if [ "$bestprice" != "" ] && [ "$bestprice" != "<span" ]; then
 			break
 		fi
@@ -48,10 +48,10 @@ originalpricepence=$(echo $bestprice | sed -e 's/\.//g' -e 's/^0*//')
 
 for i in {00..99}; do
 	printf "\rTesting product code ${productcode:0:7}$i..."
-	currentprice=$(wget -q -4 --no-dns-cache -O - "http://cpc.farnell.com/${productcode:0:7}$i" | grep taxedvalue -m 1 | cut -d" " -f1 | sed 's/£//g')
+	currentprice=$(wget -q -4 --no-dns-cache -O - "http://cpc.farnell.com/${productcode:0:7}$i" | grep taxedvalue -m 1 | cut -d" " -f1 | sed 's/£//')
 	if [ "$currentprice" != "" ]; then
-		currentpricepence=$(echo $currentprice | sed -e 's/\.//g' -e 's/^0*//')
-		bestpricepence=$(echo $bestprice | sed -e 's/\.//g' -e 's/^0*//')
+		currentpricepence=$(echo $currentprice | sed -e 's/\.//' -e 's/^0*//')
+		bestpricepence=$(echo $bestprice | sed -e 's/\.//' -e 's/^0*//')
 		if [ $currentpricepence -lt $bestpricepence ]; then
 			printf " It's cheaper at £$currentprice!\n"
 			bestprice=$currentprice
@@ -62,7 +62,7 @@ done
 
 printf "\rSearch complete!                  \n\n"
 echo The cheapest product code found is $winningcode
-bestpricepence=$(echo $bestprice | sed -e 's/\.//g' -e 's/^0*//')
+bestpricepence=$(echo $bestprice | sed -e 's/\.//' -e 's/^0*//')
 savingspence=$(($originalpricepence - $bestpricepence))
 if [ "${savingspence:-0}" -gt 0 ]; then
 	savingsdigits=$(echo $savingspence | wc -c)
