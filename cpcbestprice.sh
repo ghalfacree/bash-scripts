@@ -18,7 +18,7 @@ productcode=$(echo $1 | grep '^[A-Za-z][A-Za-z][0-9].*[0-9]')
 
 if [ "$productcode" == "" ]; then
 	echo USAGE: $0 PRODUCTCODE
-	echo Product codes are two letters, then seven or nine numbers.
+	echo Product codes are two letters, then five or seven numbers.
 	echo Any other format will be rejected.
 	exit 1
 fi
