@@ -44,7 +44,7 @@ if [ "$bestprice" == "<span" ]; then
 fi
 printf " £$bestprice found.\n"
 winningcode=$(echo $productcode at £$bestprice.)
-originalpricepence=$(echo $bestprice | sed -e 's/\.//g' -e 's/^0*//')
+originalpricepence=$(echo $bestprice | sed -e 's/\.//' -e 's/^0*//')
 
 for i in {00..99}; do
 	printf "\rTesting product code ${productcode:0:7}$i..."
