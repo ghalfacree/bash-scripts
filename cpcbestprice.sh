@@ -64,10 +64,10 @@ done
 
 printf "\rSearch complete!                  \n\n"
 echo The cheapest product code found is $winningcode
-echo Direct link: http://cpc.farnell.com/${winningcode:0:9}
 bestpricepence=$(echo $bestprice | sed -e 's/\.//' -e 's/^0*//')
 savingspence=$(($originalpricepence - $bestpricepence))
 if [ "${savingspence:-0}" -gt 0 ]; then
+	echo Direct link: http://cpc.farnell.com/${winningcode:0:9}
 	savingsdigits=$(echo $savingspence | wc -c)
 	if [ "$savingsdigits" -le 3 ];
 		then
