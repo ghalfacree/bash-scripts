@@ -27,8 +27,9 @@ printf "Finding standard price for product code $productcode..."
 
 bestprice=$(wget -q -4 --no-dns-cache -O - "http://cpc.farnell.com/$productcode" | grep taxedvalue -m 1 | cut -d" " -f1 | sed 's/£//')
 if [ "$bestprice" == "" ] || [ "$bestprice" == "<span" ]; then
-	for i in {01..10}; do
-		bestprice=$(wget -q -4 --no-dns-cache -O - "http://cpc.farnell.com/${productcode:0:7}$i" | grep taxedvalue -m 1 | cut -d" " -f1 | sed 's/£//')
+	for i in {1..10}; do
+		codenumber=0$i
+		bestprice=$(wget -q -4 --no-dns-cache -O - "http://cpc.farnell.com/${productcode:0:7}${codenumber: -2}" | grep taxedvalue -m 1 | cut -d" " -f1 | sed 's/£//')
 		if [ "$bestprice" != "" ] && [ "$bestprice" != "<span" ]; then
 			break
 		fi
@@ -46,16 +47,17 @@ printf " £$bestprice found.\n"
 winningcode=$(echo $productcode at £$bestprice.)
 originalpricepence=$(echo $bestprice | sed -e 's/\.//' -e 's/^0*//')
 
-for i in {00..99}; do
-	printf "\rTesting product code ${productcode:0:7}$i..."
-	currentprice=$(wget -q -4 --no-dns-cache -O - "http://cpc.farnell.com/${productcode:0:7}$i" | grep taxedvalue -m 1 | cut -d" " -f1 | sed 's/£//')
+for i in {0..99}; do
+	codenumber=0$i
+	printf "\rTesting product code ${productcode:0:7}${codenumber: -2}..."
+	currentprice=$(wget -q -4 --no-dns-cache -O - "http://cpc.farnell.com/${productcode:0:7}${codenumber: -2}" | grep taxedvalue -m 1 | cut -d" " -f1 | sed 's/£//')
 	if [ "$currentprice" != "" ]; then
 		currentpricepence=$(echo $currentprice | sed -e 's/\.//' -e 's/^0*//')
 		bestpricepence=$(echo $bestprice | sed -e 's/\.//' -e 's/^0*//')
 		if [ $currentpricepence -lt $bestpricepence ]; then
 			printf " It's cheaper at £$currentprice!\n"
 			bestprice=$currentprice
-			winningcode=$(echo ${productcode:0:7}$i at £$bestprice.)
+			winningcode=$(echo ${productcode:0:7}${codenumber: -2} at £$bestprice.)
 		fi
 	fi
 done
