@@ -1,5 +1,6 @@
 #!/bin/bash
 
+# Pick your filetype here. Examples: mp4, mp3, epub, pdf, txt
 filetype=mp4
 
 if [ "$1" = "" ]; then
