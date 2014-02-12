@@ -1,3 +1,3 @@
 #!/bin/bash
 echo Vectorising all PNG files using all available CPU cores...
-parallel --progress convert -monochrome -normalize -density 300 {} {.}.pbm ::: *.png && parallel --progress potrace {} -o {.}.pdf -3 ::: *.pbm && rm *.pbm
+parallel --progress convert -monochrome -normalize -density 300 {} {.}.pbm ::: *.png && parallel --progress potrace {} -o {.}.ps -3 ::: *.pbm && rm *.pbm

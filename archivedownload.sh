@@ -1,4 +1,7 @@
 #!/bin/bash
+
+filetype=mp4
+
 if [ "$1" = "" ]; then
   echo USAGE: archivedownload.sh collectionname
   echo See Archive.org entry page for the collection name.
@@ -15,7 +18,7 @@ if [ "`cat processedidentifiers.txt | wc -l`" = "0" ]; then
   exit
 fi
 echo Beginning wget download of `cat processedidentifiers.txt | wc -l` identifiers...
-wget -r -H -nc -np -nH -nd -e robots=off -i processedidentifiers.txt -B 'http://archive.org/download/' -A .pdf
+wget -r -H -nc -np -nH -nd -e robots=off -i processedidentifiers.txt -B 'http://archive.org/download/' -A .$filetype
 if ls -U *_text.pdf > /dev/null 2>&1; then
   echo Found text-format PDFs, moving into text/ directory...
   if [ -d text ]; then
