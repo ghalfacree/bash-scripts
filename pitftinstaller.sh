@@ -22,7 +22,7 @@ else
   wget http://adafruit-download.s3.amazonaws.com/raspberrypi-bootloader-adafruit-20140227-1.deb
   wget http://adafruit-download.s3.amazonaws.com/xinput-calibrator_0.7.5-1_armhf.deb
   sudo dpkg -i -B *.deb
-  apt-get install evtest tslib libts-bin
+  apt-get install evtest tslib libts-bin -y
   echo "spi-bcm2708" >> /etc/modules
   echo "fbtft_device" >> /etc/modules
   echo "options fbtft_device name=adafruitts rotate=90 frequency=32000000" > /etc/modprobe.d/adafruit.conf
