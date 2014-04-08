@@ -5,6 +5,7 @@
 
 import RPi.GPIO as GPIO
 from twython import Twython
+import datetime
 
 api_token = 'InsertTokenHere'
 api_secret = 'InsertSecretHere'
@@ -21,7 +22,7 @@ while True:
         print "Waiting for doorbell..."
         GPIO.wait_for_edge(23, GPIO.FALLING)
         print "Doorbell detected, sending direct message."
-        twitter.send_direct_message(screen_name="ghalfacree", text="DING-DONG")
+        twitter.send_direct_message(screen_name="ghalfacree", text="DING-DONG at %s" %datetime.datetime.now())
 
     except KeyboardInterrupt:
         GPIO.cleanup()
