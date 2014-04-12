@@ -27,16 +27,32 @@ while True:
         GPIO.wait_for_edge(buttonPin, GPIO.RISING)
         print 'There\'s somebody at the door, there\'s somebody at the door!'
         print 'Triggering office LED server...'
-        s = socket.socket()
-        s.connect(('192.168.0.20', 4242))
-        s.close()
-        print 'LED server notified. Ringing original doorbell...'
+        try:
+            s = socket.socket()
+            s.settimeout(1)
+            s.connect(('192.168.0.20', 4242))
+            s.close()
+            print 'LED server notified.'
+        except socket.error:
+            print 'Network error, LED server offline.'
+        print 'Ringing original doorbell...'
         GPIO.output(relayPin, False)
         time.sleep(0.5)
         GPIO.output(relayPin, True)
-        print 'Doorbell sounding. Sending Twitter DM...'
+        print 'Doorbell sounding.'
+        print 'Alerting Trioptimum...'
+        try:
+            s = socket.socket()
+            s.settimeout(1)
+            s.connect(('192.168.0.50', 4242))
+            s.close()
+            print 'Trioptimum notified.'
+        except socket.error:
+            print 'Network error, Trioptimum offline.'
+        print 'Sending Twitter DM...'
         twitter.send_direct_message(screen_name=screenName, text='DING-DONG at %s' %datetime.datetime.now())
         print 'Message sent. All done!'
+        print
 
     except KeyboardInterrupt:
         GPIO.cleanup()
