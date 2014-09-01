@@ -6,5 +6,6 @@ rsync -av --delete --progress /media/Data/Photos/ altair:/media/ExternalDrives/P
 echo Synchronising remote music archive...
 rsync -av --delete --progress /media/Data/My\ Music/ altair:/media/ExternalDrives/Music/
 echo "Synchronising remote video archive..."
+chmod -R a+r /media/Data/Videos/*
 rsync -av --delete --progress /media/Data/Videos/ altair:/media/ExternalDrives/Videos/
 echo Backup complete.
