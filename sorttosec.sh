@@ -10,7 +10,7 @@ for i in `find . -iname "*adf"`; do
     gamename=`echo $i | cut -d\( -f1 | sed 's/ *$//'`
     echo mv "$i" "$gamename - $disknumber.adf"
   else
-    gamename=`echo $i | echo $i |cut -d\( -f1 | sed 's/ *$//'`
+    gamename=`echo $i | cut -d\( -f1 | sed 's/ *$//'`
     echo mv "$i" "$gamename.adf"
   fi
 done
