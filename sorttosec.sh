@@ -7,7 +7,7 @@ for i in `find . -iname "*adf"`; do
   if grep -q \(Disk\  <<< $i; then
     locationvar=`echo $i | grep -b -o \(Disk\  | cut -d\: -f1 | sed 's/ *$//'`
     disknumber=`echo ${i:$locationvar} | cut -d\( -f2 | cut -d\) -f1 | sed 's/ *$//'`
-    gamename=`echo $i |  echo $i |cut -d\( -f1 | sed 's/ *$//'`
+    gamename=`echo $i | cut -d\( -f1 | sed 's/ *$//'`
     echo mv "$i" "$gamename - $disknumber.adf"
   else
     gamename=`echo $i | echo $i |cut -d\( -f1 | sed 's/ *$//'`
