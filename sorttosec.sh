@@ -40,9 +40,11 @@ for i in `find . -iname "*adf"`; do
     continue
   fi
   if grep -q '\[b' <<< $i; then
-    echo DELETION - Bad dump found in $i.
-    rm "$i"
-    continue
+    if grep -q '\[b\ ' <<< $i; then
+      echo DELETION - Bad dump found in $i.
+      rm "$i"
+      continue
+    fi
   fi
 
   # Translation tests!
