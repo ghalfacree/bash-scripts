@@ -15,7 +15,7 @@ if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
     $convert='/usr/bin/convert';
     $exiftool='/usr/bin/exiftool';
     //set font variable as needed (Mac/Win) for color scale
-    $font='-font /Library/Fonts/Arial\ Bold.ttf';
+    $font='-font /usr/share/fonts/truetype/liberation/LiberationSans-Bold.ttf';
     $escape='\\';
 }
 
@@ -213,7 +213,7 @@ if ( !isset($options['pip']) )
 }else{
 //make PiP
     //read embedded image
-    exec($exiftool." -b -EmbeddedImage $flirimg | ".$convert." - -set colorspace YCbCr -colorspace RGB embedded.png");
+    exec($exiftool." -b -EmbeddedImage $flirimg | ".$convert." - embedded.png");
     $geometrie=$exif[0]['OffsetX'].$exif[0]['OffsetY'];
     if ( is_string($options['pip']) )
     {
