@@ -4,7 +4,7 @@ mkdir /tmp/drivestats
 
 for i in a b c d; do
   echo /dev/sd$i status:
-  smartctl -a /dev/sd$i > '/tmp/drivestats/sd'$i'status.txt'
+  /usr/sbin/smartctl -a /dev/sd$i > '/tmp/drivestats/sd'$i'status.txt'
   grep "Model" '/tmp/drivestats/sd'$i'status.txt'
   grep Reallocated '/tmp/drivestats/sd'$i'status.txt'
   grep Pending '/tmp/drivestats/sd'$i'status.txt'
