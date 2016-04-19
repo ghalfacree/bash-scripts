@@ -3,8 +3,8 @@
 
 import time, socket, subprocess
 
-bashCommand = "mpg321 /home/blacklaw/bellringing.mp3"
-
+bashCommand = "sudo -u blacklaw mocp --pause"
+bashCommand2 = "mpg321 /home/blacklaw/bellringing.mp3"
 s = socket.socket()
 port = 4242
 s.bind(('0.0.0.0', port))
@@ -17,6 +17,8 @@ while True:
         print 'Connection accepted from', addr
         print 'Wakey-wakey!.'
         process = subprocess.Popen(bashCommand.split(), stdout=subprocess.PIPE)
+        output = process.communicate()[0]
+        process = subprocess.Popen(bashCommand2.split(), stdout=subprocess.PIPE)
         output = process.communicate()[0]
         c.send('Bell rung.\n')
         c.close()
