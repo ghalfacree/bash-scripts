@@ -11,7 +11,7 @@ echo
 exit 0
 
 # Pick your filetype here. Examples: mp4, mp3, epub, pdf, txt
-filetype=mp4
+filetype=pdf
 
 if [ "$1" = "" ]; then
   echo USAGE: archivedownload.sh collectionname
@@ -30,7 +30,11 @@ if [ "`cat processedidentifiers.txt | wc -l`" = "0" ]; then
   exit
 fi
 echo Beginning wget download of `cat processedidentifiers.txt | wc -l` identifiers...
+<<<<<<< HEAD
 wget -r -H -nc -np -nH -nd -e robots=off --max-redirect 0 --domains archive.org --exclude-domains blog.archive.org -i processedidentifiers.txt -B 'http://archive.org/download/' -A .$filetype
+=======
+wget -r -H -Darchive.org --exclude-domains blog.archive.org,store.archive.org -nc -np -nH -nd -e robots=off -i processedidentifiers.txt -B 'http://archive.org/download/' -A .$filetype
+>>>>>>> e64aa43a05ee5b135d7f514ca0c9baa05e517a88
 if ls -U *_text.pdf > /dev/null 2>&1; then
   echo Found text-format PDFs, moving into text/ directory...
   if [ -d text ]; then
