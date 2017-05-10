@@ -17,4 +17,4 @@ Pi default)"
         	mode=12;;
 esac
 
-gst-launch -v decklinksrc mode=$mode connection=1 subdevice=0 ! video/x-raw-yuv ! ffmpegcolorspace ! xvimagesink sync=false
+gst-launch -v decklinkvideosrc mode=$mode connection=1 subdevice=0 ! video/x-raw-yuv ! ffmpegcolorspace ! xvimagesink sync=false
