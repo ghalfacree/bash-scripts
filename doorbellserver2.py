@@ -6,6 +6,7 @@ import time, socket, subprocess
 bashCommand = "sudo -u blacklaw mocp --pause"
 bashCommand2 = "mpg321 /home/blacklaw/bellringing.mp3"
 s = socket.socket()
+s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 port = 4242
 s.bind(('0.0.0.0', port))
 s.listen(5)
