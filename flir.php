@@ -24,7 +24,7 @@ $font_color='white';
 $frame_color='black';
 
 //extract embedded palette to
-$embpal='palette.png';
+$pal='palette.png';
 
 //--------------------------------------------------------------------------
 
@@ -39,10 +39,14 @@ $longopts  = array(
     "rmax:",    
     "pal:",
     "tref:",
+    "tatm:",
+    "dist:",
+    "hum:",
     "emis:",
     "pip::",       // opt. value
     "clut",        // No value
-    "scale",      
+    "scale", 
+    "stretch",  
     "msx",
     "shade",
     "help",       
@@ -62,15 +66,19 @@ Settings:
 -o output.jpg       save  8 Bit image jpg
 -o output.png       save 16 Bit image png
 
-Options Summary:
+Options Summary (type input values without units) :
 --resize val        scale sensor size with "convert -resize val" (val i.e. 600x or 100%, default is 200%)
 --tref temp         overwrite embedded Reflected Apparent Temperature (degree Celsius) 
+--tatm temp         overwrite embedded Atmospheric Temperature (degree Celsius) 
+--dist distance     overwrite embedded Object Distance (m)
+--hum humidity      overwrite embedded Relative Humidity (%)
 --emis val          overwrite embedded Emissivity (val i.e. 0.95)
 --rmin raw_min      set min RAW value instead embedded value (set scale min temp)
 --rmax raw_ma       set max RAW value instead embedded value (set scale max temp)
 --pal iron.png      use own palette (instead of embedded palette.png)
 --clut              disable "Color LookUp Table" and color scale (save a grayscale image)
 --scale             disable color scale on the right edge
+--stretch           stretch "middle of color scale" to "medium of gray image"
 --pip[=AxB]         input image is a flir PiP radiometric image
                     overlay embedded "real image" with "ir image"
                     [optional] crop ir image to size AxB (i.e. --pip=90x90 )
@@ -104,13 +112,6 @@ if (isset($options['i']))
     exit(1);
 };
 
-if (isset($options['pal']))
-{
-    $pal="\"".$options['pal']."\"";  
-} else {
-    $pal=$embpal;
-}
-
 if (isset($options['resize']))
 {
     $resize='-resize '.$options['resize'];    
@@ -130,22 +131,53 @@ if (isset($options['tref']))
     $tmp=explode(" ",$exif[0]['ReflectedApparentTemperature']);
     $Temp_ref = $tmp[0];
 }
+
+if (isset($options['tatm']))
+{
+    $Temp_atm=$options['tatm'];  
+} else {
+    $tmp=explode(" ",$exif[0]['AtmosphericTemperature']);
+    $Temp_atm = $tmp[0];
+}
+
+if (isset($options['dist']))
+{
+    $Distance=$options['dist'];  
+} else {
+    $tmp=explode(" ",$exif[0]['ObjectDistance']);
+    $Distance = $tmp[0];
+}
+
+
+if (isset($options['hum']))
+{
+    $Humidity=$options['hum'];  
+} else {
+    $tmp=explode(" ",$exif[0]['RelativeHumidity']);
+    $Humidity = $tmp[0];
+}
+
 if (isset($options['emis']))
 {
     $Emissivity=$options['emis'];  
 } else {
     $Emissivity=$exif[0]['Emissivity'];
 }
-print("\nReflected Apparent Temperature: ".$Temp_ref." degree Celsius\nEmissivity: ".$Emissivity."\n");
 
-// save Flir values for Plancks Law for better reading in short variables
+// save Flir values for Plancks Law and Atmospheric Transmission for better reading in short variables
 $R1=$exif[0]['PlanckR1'];
 $R2=$exif[0]['PlanckR2'];
 $B= $exif[0]['PlanckB'];
 $O= $exif[0]['PlanckO'];
 $F= $exif[0]['PlanckF'];
+$A1= $exif[0]['AtmosphericTransAlpha1'];
+$A2= $exif[0]['AtmosphericTransAlpha2'];
+$B1= $exif[0]['AtmosphericTransBeta1'];
+$B2= $exif[0]['AtmosphericTransBeta2'];
+$X= $exif[0]['AtmosphericTransX'];
 
-print('Plancks values: '.$R1.' '.$R2.' '.$B.' '.$O.' '.$F."\n\n");
+print('Plancks values: '.$R1.' '.$R2.' '.$B.' '.$O.' '.$F."\n");
+print('Atmosph values: '.$A1.' '.$A2.' '.$B1.' '.$B2.' '.$X."\n\n");
 
 // get displayed temp range in RAW values
 $RAWmax=$exif[0]['RawValueMedian']+$exif[0]['RawValueRange']/2;
@@ -157,27 +189,36 @@ printf("RAW Temp Range FLIR setting: %d %d\n",$RAWmin,$RAWmax);
 if (isset($options['rmin'])) $RAWmin=$options['rmin'];
 if (isset($options['rmax'])) $RAWmax=$options['rmax'];
 
-printf("RAW Temp Range select      : %d %d\n",$RAWmin,$RAWmax);
+printf("RAW Temp Range select      : %d %d \n\n",$RAWmin,$RAWmax);
 
+// calc atm transmission
+$H2o = ($Humidity/100) * exp(1.5587 + 6.939e-2 * $Temp_atm - 2.7816e-4 * pow($Temp_atm,2) + 6.8455e-7 * pow($Temp_atm,3));
+$Tau = $X * exp(-sqrt($Distance) * ($A1 + $B1 * sqrt($H2o))) + (1-$X) * exp(-sqrt($Distance) * ($A2 + $B2 * sqrt($H2o)));
+print('Atmosph : '.$Temp_atm.'C '.$Humidity.'% '.$Distance."m \nTau=".$Tau."\n");
+print("Reflected Apparent Temperature: ".$Temp_ref." degree Celsius\nEmissivity: ".$Emissivity."\n");
+
+// calc amount of radiance from athmosphere 
+$RAWatm=$R1/($R2*(exp($B/($Temp_atm+273.15))-$F))-$O;
 // calc amount of radiance of reflected objects ( Emissivity < 1 )
 $RAWrefl=$R1/($R2*(exp($B/($Temp_ref+273.15))-$F))-$O;
-printf("RAW reflected: %d\n",$RAWrefl); 
+printf("RAW athmosphere: %d / RAW reflected %d\n\n",$RAWatm,$RAWrefl); 
 
 // get displayed object temp max/min and convert to "%.1f" for printing
-$RAWmaxobj=($RAWmax-(1-$Emissivity)*$RAWrefl)/$Emissivity;
-$RAWminobj=($RAWmin-(1-$Emissivity)*$RAWrefl)/$Emissivity;
+$RAWmaxobj=($RAWmax-(1-$Tau)* $RAWatm-(1-$Emissivity)*$Tau*$RAWrefl)/$Emissivity/$Tau;
+$RAWminobj=($RAWmin-(1-$Tau)* $RAWatm-(1-$Emissivity)*$Tau*$RAWrefl)/$Emissivity/$Tau;
 $Temp_min=sprintf("%.1f", $B/log($R1/($R2*($RAWminobj+$O))+$F)-273.15);
 $Temp_max=sprintf("%.1f", $B/log($R1/($R2*($RAWmaxobj+$O))+$F)-273.15);
 
 // extract color table, swap Cb Cr and expand video pal color table from [16,235] to [0,255]
 // best results: Windows -colorspace sRGB | MAC -colorspace RGB
-exec($exiftool.' '.$flirimg.' -b -Palette | '.$convert.' -size "'.$exif[0]['PaletteColors'].'X1" -depth 8 YCbCr:- -separate -swap 1,2 -set colorspace YCbCr -combine -colorspace RGB -auto-level '.$embpal);
+exec($exiftool.' '.$flirimg.' -b -Palette | '.$convert.' -size "'.$exif[0]['PaletteColors'].'X1" -depth 8 YCbCr:- -separate -swap 1,2 -set colorspace YCbCr -combine -colorspace sRGB -auto-level '.$pal);
 
-// draw color scale
-exec($convert." -size 30x256 gradient: $pal -clut -mattecolor ".$frame_color.' -frame 5x5 -set colorspace rgb gradient.png');
-
-// if your imagemagick have no freetype library remove the next line
-exec($convert." gradient.png -background ".$frame_color." ".$font." -fill ".$font_color." -pointsize 15 label:\"$Temp_max C\" +swap -gravity Center -append  label:\"$Temp_min\" -append gradient.png");
+//dirty hack to copy external palette
+if (isset($options['pal']))
+{
+    $extpal="\"".$options['pal']."\"";  
+    exec($convert." $extpal $pal");
+}
 
 if ($exif[0]['RawThermalImageType'] != "TIFF")
 {
@@ -187,13 +228,33 @@ if ($exif[0]['RawThermalImageType'] != "TIFF")
 }else{
    exec($exiftool." -b -RawThermalImage $flirimg | ".$convert." - raw.png");      
 }
-print('RAW Temp Range from sensor : '.exec($convert.' raw.png -format "%[min] %[max]" info:')."\n");
+print("\nRAW Temp Range from sensor : ".exec($convert.' raw.png -format "%[min] %[max]" info:')."\n");
 
 // convert every RAW-16-Bit Pixel with Planck's Law to a Temperature Grayscale value and append temp scale
 $Smax=$B/log($R1/($R2*($RAWmax+$O))+$F);
 $Smin=$B/log($R1/($R2*($RAWmin+$O))+$F);
 $Sdelta=$Smax-$Smin;
-exec($convert." raw.png -fx \"($B/ln($R1/($R2*(65535*u+$O))+$F)-$Smin)/$Sdelta\" ir.png");
+
+// old fast variant:
+// exec($convert." raw.png -fx \"($B/ln($R1/($R2*(65535*u+$O))+$F)-$Smin)/$Sdelta\" ir.png");
+// updated with check RAW value > |Planck Offset|
+// x?y:z  Imagemagick ternary conditional expression, returns value y if x > 0, otherwise z
+exec($convert." raw.png -fx \"($B/ln($R1/($R2*((65535*u+$O)?(65535*u+$O):1))+$F)-$Smin)/$Sdelta\" ir.png");
+
+//stretch "middle of color scale" to "medium of gray image"
+if ( isset($options['stretch']) )
+ {
+     $mean=exec($convert." ir.png -format \"%[fx:mean]\" info:");
+     $gamma=log($mean)/log(0.5);
+     print("\nstretch color table with gamma: $gamma (mean image gray: $mean)\n");
+     exec($convert." -size 224x1 gradient:gray0-gray100 -gamma $gamma $pal -clut $pal");
+}
+
+// draw color scale
+exec($convert . ' -size 16x300 gradient: ' . $pal . ' -clut -mattecolor ' . $font_color . ' -frame 1x1 -set colorspace rgb -mattecolor gray -frame 1x1 "gradient.png"');
+
+// if your imagemagick have no freetype library remove the next line
+exec($convert." gradient.png -background ".$frame_color." ".$font." -fill ".$font_color." -pointsize 15 label:\"$Temp_max C\" +swap -gravity Center -append  label:\"$Temp_min\" -append gradient.png");
 
 if ( !isset($options['pip']) )
 {    
@@ -211,9 +272,18 @@ if ( !isset($options['pip']) )
             exec($convert." ir.png ".$resize." ".$destimg);
     }    
 }else{
-//make PiP
+    //make PiP
     //read embedded image
-    exec($exiftool." -b -EmbeddedImage $flirimg | ".$convert." - embedded.png");
+    printf("Embedded Image Type: %s\n",$exif[0]['EmbeddedImageType']);
+    if ($exif[0]['EmbeddedImageType'] == "PNG")
+    {
+       // 8 Bit PNG, change Colorspace
+       exec($exiftool." -b -EmbeddedImage $flirimg | ".$convert." - -set colorspace YCbCr -colorspace RGB embedded.png");      
+    }else{
+        //8 bit jpg
+       exec($exiftool." -b -EmbeddedImage $flirimg | ".$convert." - embedded.png");
+    }
+    
     $geometrie=$exif[0]['OffsetX'].$exif[0]['OffsetY'];
     if ( is_string($options['pip']) )
     {
