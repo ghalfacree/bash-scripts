@@ -4,7 +4,7 @@
 if `xinput -list | grep -q SynPS`; then
     echo ERROR: SynPS/2 device found.
     echo Suspend and resume your laptop, then run this script again.
-    notify-send -i /usr/share/icons/suru/devices/scalable/input-touchpad-symbolic.svg "Touchpad Toggle" "ERROR: SynPS/2 device found. Suspend and result your laptop."
+    notify-send -i /usr/share/icons/suru/devices/scalable/input-touchpad-symbolic.svg "Touchpad Toggle" "ERROR: SynPS/2 device found. Suspend then resume your laptop."
     exit 1
 fi
 
