@@ -19,7 +19,8 @@ if [ ! -f $1 ]; then
 fi
 
 exiftool $1 -b -EmbeddedImage > $2.dat
-flir.php --resize 465 -i $1 -o $2.png
+flir.php --resize 465 -i $1 -o $2.jpg
+#flir.php --resize 465 -i $1 -o $2.png
 rm ir.png gradient.png palette.png raw.png
 echo File converted!
 exit
