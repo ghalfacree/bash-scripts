@@ -8,10 +8,10 @@
 # This version expects a custom TaskWarrior report type: "dymo"
 # If you don't have one:
 # Config Variable         Value
-# report.dymo.columns     project,description.count
+# report.dymo.columns     id,project,description.count
 # report.dymo.description List of due tasks formatted for the Dymo
 # report.dymo.filter      due.after:yesterday and due.before:tomorrow and status:pending
-# report.dymo.labels      Project,Description
+# report.dymo.labels      ID,Project,Description
 # report.dymo.sort        project+/,entry+
 
 # Tasty variables
