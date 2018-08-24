@@ -11,8 +11,8 @@
 # report.dymo.columns     project,description.count
 # report.dymo.description List of due tasks formatted for the Dymo
 # report.dymo.filter      due.after:yesterday and due.before:tomorrow and status:pending
- #report.dymo.labels      Project,Description
- #report.dymo.sort        project+/,entry+
+# report.dymo.labels      Project,Description
+# report.dymo.sort        project+/,entry+
 
 # Tasty variables
 LOCATION="bradford"			# Insert your location here
