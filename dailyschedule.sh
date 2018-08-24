@@ -1,9 +1,18 @@
 #!/bin/bash
 
-# Daily schedule printer! v0.1
+# Daily schedule printer! v0.2
 # gareth@halfacree.co.uk / https://freelance.halfacree.co.uk
 # Depends: Various defaults plus task, figlet,fortune, cowsay, and a 'net
 # connection.
+
+# This version expects a custom TaskWarrior report type: "dymo"
+# If you don't have one:
+# Config Variable         Value
+# report.dymo.columns     project,description.count
+# report.dymo.description List of due tasks formatted for the Dymo
+# report.dymo.filter      due.after:yesterday and due.before:tomorrow and status:pending
+ #report.dymo.labels      Project,Description
+ #report.dymo.sort        project+/,entry+
 
 # Tasty variables
 LOCATION="bradford"			# Insert your location here
@@ -26,7 +35,7 @@ printf "\n" >> "$SCHEDULEFILE"
 # Now tasks...
 echo "Tasks Due Today" >> "$SCHEDULEFILE"
 echo -n "---------------" >> "$SCHEDULEFILE"
-task +DUETODAY list >> "$SCHEDULEFILE"
+task dymo >> "$SCHEDULEFILE"
 printf "\n" >> "$SCHEDULEFILE"
 
 # Now a fortune cookie
