@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Daily schedule printer! v0.2
+# Daily schedule printer! v0.3
 # gareth@halfacree.co.uk / https://freelance.halfacree.co.uk
 # Depends: Various defaults plus task, figlet,fortune, cowsay, and a 'net
 # connection.
@@ -13,6 +13,9 @@
 # report.dymo.filter      due.after:yesterday and due.before:tomorrow and status:pending
 # report.dymo.labels      ID,Project,Description
 # report.dymo.sort        project+/,entry+
+
+# Current formatting optimised for a Dymo 450 using S0929100 name cards.
+# Set CUPS to 36cpi/18lpi and a page size of 4.6x7.1cm.
 
 # Tasty variables
 LOCATION="bradford"			# Insert your location here
@@ -28,9 +31,8 @@ printf "\n" >> "$SCHEDULEFILE"
 # Let's start with the weather...
 echo "Today's Weather" >> "$SCHEDULEFILE"
 echo "---------------" >> "$SCHEDULEFILE"
-curl -s wttr.in/$LOCATION >> "$WEATHERFILE" && \
-head -7 "$WEATHERFILE" | tail -5 | sed 's/\x1b\[[0-9;]*m//g' >> "$SCHEDULEFILE"
-printf "\n" >> "$SCHEDULEFILE" 
+curl -s wttr.in/$LOCATION?1QTn >> "$WEATHERFILE" && \
+head -16 "$WEATHERFILE" >> "$SCHEDULEFILE"
 
 # Now tasks...
 echo "Tasks Due Today" >> "$SCHEDULEFILE"
