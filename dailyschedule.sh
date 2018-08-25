@@ -20,7 +20,6 @@
 # Tasty variables
 LOCATION="bradford"			# Insert your location here
 SCHEDULEFILE="/tmp/dailyschedule.txt"	# Temporary file for the output
-WEATHERFILE="/tmp/weather.tmp"		# Temporary file for the weather info
 PRINTERNAME="LabelWriter-450"		# Name of lp-compatible printer
 
 # The header
@@ -31,8 +30,8 @@ printf "\n" >> "$SCHEDULEFILE"
 # Let's start with the weather...
 echo "Today's Weather" >> "$SCHEDULEFILE"
 echo "---------------" >> "$SCHEDULEFILE"
-curl -s wttr.in/$LOCATION?1QTn >> "$WEATHERFILE" && \
-head -16 "$WEATHERFILE" >> "$SCHEDULEFILE"
+curl -s wttr.in/$LOCATION?0QT >> "$SCHEDULEFILE"
+printf "\n" >> "$SCHEDULEFILE"
 
 # Now tasks...
 echo "Tasks Due Today" >> "$SCHEDULEFILE"
@@ -49,5 +48,5 @@ fortune -a -s | cowsay >> "$SCHEDULEFILE"
 fold -w 65 -s "$SCHEDULEFILE" | lp -d $PRINTERNAME
 
 # Housekeeping
-rm "$WEATHERFILE" "$SCHEDULEFILE"
+rm "$SCHEDULEFILE"
 exit 0
