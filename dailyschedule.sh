@@ -19,7 +19,7 @@
 
 # Tasty variables
 LOCATION="bradford"							# Insert your location here
-CALENDARS="--calendar=Home --calendar=Work --calendar=Deadlines" 	# Calendars to be used by GCalCLI
+CALENDARS="--calendar=Home --calendar=Work --calendar=Deadlines"	# Calendars to be used by GCalCLI
 SCHEDULEFILE="/tmp/dailyschedule.txt"					# Temporary file for the output
 PRINTERNAME="LabelWriter-450"						# Name of lp-compatible printer
 
@@ -43,7 +43,7 @@ printf "\n" >> "$SCHEDULEFILE"
 # Calendar...
 echo "This Week's Schedule" >> "$SCHEDULEFILE"
 echo -n "--------------------" >> "$SCHEDULEFILE"
-gcalcli calw 1 $CALENDARS --nocolor --nolineart -w 9 >> "$SCHEDULEFILE"
+gcalcli calw 1 --calendar="Holidays in United Kingdom" $CALENDARS --nocolor --nolineart -w 9 >> "$SCHEDULEFILE"
 
 # Now a fortune cookie
 echo "What Does the Cow Say?" >> "$SCHEDULEFILE"
