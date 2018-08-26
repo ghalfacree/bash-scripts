@@ -1,9 +1,14 @@
 #!/bin/bash
 
-# Daily schedule printer! v0.5
+# Daily schedule printer! v0.6
 # gareth@halfacree.co.uk / https://freelance.halfacree.co.uk
 # Depends: Various defaults plus task, figlet, fortune, cowsay,
 # gcalcli with oauth configured, and a 'net connection.
+# Now with word of the day; requires "wordoftheday.sh" from the
+# same place you got this.
+
+# NO LONGER PRINTS BY DEFAULT; OUTPUTS TO STDOUT INSTEAD!
+# To actually print, use the --print flag.
 
 # This version expects a custom TaskWarrior report type: "dymo"
 # If you don't have one:
@@ -42,6 +47,10 @@ printf "\n" >> "$SCHEDULEFILE"
 # Calendar...
 echo -n "THIS WEEK'S SCHEDULE" >> "$SCHEDULEFILE"
 gcalcli calw 1 --calendar="Holidays in United Kingdom" $CALENDARS --nocolor --nolineart -w 9 >> "$SCHEDULEFILE"
+
+# Word of the Day
+echo "WORD OF THE DAY" >> "$SCHEDULEFILE"
+wordoftheday.sh >> "$SCHEDULEFILE"
 
 # Now wrap and print...
 if [ "$1" == "--print" ]; then
