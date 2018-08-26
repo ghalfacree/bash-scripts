@@ -27,13 +27,11 @@ PRINTERNAME="LabelWriter-450"						# Name of lp-compatible printer
 
 # The header
 date +"%a %F" | figlet -f small.flf > "$SCHEDULEFILE"
-printf "\n" >> "$SCHEDULEFILE"
 
 # Let's start with the weather and cow...
-echo "TODAY'S WEATHER" >> "$SCHEDULEFILE"
 curl -s wttr.in/$LOCATION?0QT > "$WEATHERFILE"
 fortune -a -s | cowsay -W 30 > "$COWFILE"
-paste "$WEATHERFILE" "$COWFILE" | column -s $'\t' -t >> "$SCHEDULEFILE"
+paste "$COWFILE" "$WEATHERFILE" | column -s $'\t' -t >> "$SCHEDULEFILE"
 printf "\n" >> "$SCHEDULEFILE"
 
 # Now tasks...
@@ -46,7 +44,11 @@ echo -n "THIS WEEK'S SCHEDULE" >> "$SCHEDULEFILE"
 gcalcli calw 1 --calendar="Holidays in United Kingdom" $CALENDARS --nocolor --nolineart -w 9 >> "$SCHEDULEFILE"
 
 # Now wrap and print...
-fold -w 72 -s "$SCHEDULEFILE" | lp -d $PRINTERNAME
+if [ "$1" == "--print" ]; then
+    fold -w 72 -s "$SCHEDULEFILE" | lp -d $PRINTERNAME
+else
+    fold -w 72 -s "$SCHEDULEFILE" | cat "$SCHEDULEFILE"
+fi
 
 # Housekeeping
 rm "$SCHEDULEFILE" "$WEATHERFILE" "$COWFILE"
