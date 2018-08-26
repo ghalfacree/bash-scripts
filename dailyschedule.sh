@@ -24,7 +24,7 @@ SCHEDULEFILE="/tmp/dailyschedule.txt"					# Temporary file for the output
 PRINTERNAME="LabelWriter-450"						# Name of lp-compatible printer
 
 # The header
-date +"%A %F" | figlet -f small.flf > "$SCHEDULEFILE"
+date +"%a %F" | figlet -f small.flf > "$SCHEDULEFILE"
 printf "\n" >> "$SCHEDULEFILE"
 
 # Let's start with the weather...
