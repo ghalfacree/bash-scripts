@@ -34,7 +34,7 @@ printf "\n" >> "$SCHEDULEFILE"
 
 # Now tasks...
 echo -n "TASKS DUE TODAY" >> "$SCHEDULEFILE"
-task dymo >> "$SCHEDULEFILE" || echo "No tasks due!" >> "$SCHEDULEFILE"
+task dymo >> "$SCHEDULEFILE" || printf "\nNo tasks due!\n" >> "$SCHEDULEFILE"
 printf "\n" >> "$SCHEDULEFILE"
 
 # Calendar...
