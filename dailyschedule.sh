@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Daily schedule printer! v0.4
+# Daily schedule printer! v0.5
 # gareth@halfacree.co.uk / https://freelance.halfacree.co.uk
 # Depends: Various defaults plus task, figlet, fortune, cowsay,
 # gcalcli with oauth configured, and a 'net connection.
@@ -21,15 +21,19 @@
 LOCATION="bradford"							# Insert your location here
 CALENDARS="--calendar=Home --calendar=Work --calendar=Deadlines"	# Calendars to be used by GCalCLI
 SCHEDULEFILE="/tmp/dailyschedule.txt"					# Temporary file for the output
+WEATHERFILE="/tmp/weather.txt"						# Temporary file for the weather
+COWFILE="/tmp/cowfile.txt"						# Temporary file for the cowsay output
 PRINTERNAME="LabelWriter-450"						# Name of lp-compatible printer
 
 # The header
 date +"%a %F" | figlet -f small.flf > "$SCHEDULEFILE"
 printf "\n" >> "$SCHEDULEFILE"
 
-# Let's start with the weather...
+# Let's start with the weather and cow...
 echo "TODAY'S WEATHER" >> "$SCHEDULEFILE"
-curl -s wttr.in/$LOCATION?0QT >> "$SCHEDULEFILE"
+curl -s wttr.in/$LOCATION?0QT > "$WEATHERFILE"
+fortune -a -s | cowsay -W 30 > "$COWFILE"
+paste "$WEATHERFILE" "$COWFILE" | column -s $'\t' -t >> "$SCHEDULEFILE"
 printf "\n" >> "$SCHEDULEFILE"
 
 # Now tasks...
@@ -41,13 +45,9 @@ printf "\n" >> "$SCHEDULEFILE"
 echo -n "THIS WEEK'S SCHEDULE" >> "$SCHEDULEFILE"
 gcalcli calw 1 --calendar="Holidays in United Kingdom" $CALENDARS --nocolor --nolineart -w 9 >> "$SCHEDULEFILE"
 
-# Now a fortune cookie
-echo "WHAT DOES THE COW SAY?" >> "$SCHEDULEFILE"
-fortune -a -s | cowsay >> "$SCHEDULEFILE"
-
 # Now wrap and print...
 fold -w 72 -s "$SCHEDULEFILE" | lp -d $PRINTERNAME
 
 # Housekeeping
-rm "$SCHEDULEFILE"
+rm "$SCHEDULEFILE" "$WEATHERFILE" "$COWFILE"
 exit 0
