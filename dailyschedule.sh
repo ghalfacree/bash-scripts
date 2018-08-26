@@ -28,25 +28,21 @@ date +"%a %F" | figlet -f small.flf > "$SCHEDULEFILE"
 printf "\n" >> "$SCHEDULEFILE"
 
 # Let's start with the weather...
-echo "Today's Weather" >> "$SCHEDULEFILE"
-echo "---------------" >> "$SCHEDULEFILE"
+echo "TODAY'S WEATHER" >> "$SCHEDULEFILE"
 curl -s wttr.in/$LOCATION?0QT >> "$SCHEDULEFILE"
 printf "\n" >> "$SCHEDULEFILE"
 
 # Now tasks...
-echo "Tasks Due Today" >> "$SCHEDULEFILE"
-echo -n "---------------" >> "$SCHEDULEFILE"
-task dymo >> "$SCHEDULEFILE"
+echo -n "TASKS DUE TODAY" >> "$SCHEDULEFILE"
+task dymo >> "$SCHEDULEFILE" || echo "No tasks due!" >> "$SCHEDULEFILE"
 printf "\n" >> "$SCHEDULEFILE"
 
 # Calendar...
-echo "This Week's Schedule" >> "$SCHEDULEFILE"
-echo -n "--------------------" >> "$SCHEDULEFILE"
+echo -n "THIS WEEK'S SCHEDULE" >> "$SCHEDULEFILE"
 gcalcli calw 1 --calendar="Holidays in United Kingdom" $CALENDARS --nocolor --nolineart -w 9 >> "$SCHEDULEFILE"
 
 # Now a fortune cookie
-echo "What Does the Cow Say?" >> "$SCHEDULEFILE"
-echo "----------------------" >> "$SCHEDULEFILE"
+echo "WHAT DOES THE COW SAY?" >> "$SCHEDULEFILE"
 fortune -a -s | cowsay >> "$SCHEDULEFILE"
 
 # Now wrap and print...
