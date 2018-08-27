@@ -32,7 +32,7 @@ printf "\n" >> "$SCHEDULEFILE"
 
 # Now tasks...
 echo -n "TASKS" >> "$SCHEDULEFILE"
-task minimal >> "$SCHEDULEFILE" || printf "\nNo tasks due!\n" >> "$SCHEDULEFILE"
+task ls >> "$SCHEDULEFILE" || printf "\nNo tasks due!\n" >> "$SCHEDULEFILE"
 printf "\n" >> "$SCHEDULEFILE"
 
 # Calendar...
