@@ -10,15 +10,6 @@
 # NO LONGER PRINTS BY DEFAULT; OUTPUTS TO STDOUT INSTEAD!
 # To actually print, use the --print flag.
 
-# This version expects a custom TaskWarrior report type: "dymo"
-# If you don't have one:
-# Config Variable         Value
-# report.dymo.columns     id,project,description.count
-# report.dymo.description List of due tasks formatted for the Dymo
-# report.dymo.filter      due.after:yesterday and due.before:tomorrow and status:pending
-# report.dymo.labels      ID,Project,Description
-# report.dymo.sort        project+/,entry+
-
 # Current formatting optimised for a Dymo 450 using S0929100 name cards.
 # Set CUPS to 40cpi/18lpi and a page size of 4.6x7.1cm.
 
@@ -40,8 +31,8 @@ paste "$COWFILE" "$WEATHERFILE" | column -s $'\t' -t >> "$SCHEDULEFILE"
 printf "\n" >> "$SCHEDULEFILE"
 
 # Now tasks...
-echo -n "TASKS DUE TODAY" >> "$SCHEDULEFILE"
-task dymo >> "$SCHEDULEFILE" || printf "\nNo tasks due!\n" >> "$SCHEDULEFILE"
+echo -n "TASKS" >> "$SCHEDULEFILE"
+task minimal >> "$SCHEDULEFILE" || printf "\nNo tasks due!\n" >> "$SCHEDULEFILE"
 printf "\n" >> "$SCHEDULEFILE"
 
 # Calendar...
