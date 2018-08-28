@@ -26,7 +26,7 @@ date +"%a %F" | figlet -f small.flf > "$SCHEDULEFILE"
 
 # Let's start with the weather and cow...
 curl -s wttr.in/$LOCATION?0QT > "$WEATHERFILE"
-fortune -a -s | cowsay -W 30 > "$COWFILE"
+/usr/games/fortune -a -s | /usr/games/cowsay -W 30 > "$COWFILE"
 paste "$COWFILE" "$WEATHERFILE" | column -s $'\t' -t >> "$SCHEDULEFILE"
 printf "\n" >> "$SCHEDULEFILE"
 
