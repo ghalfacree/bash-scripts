@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Daily schedule printer! v0.6
+# Daily schedule printer! v0.7
 # gareth@halfacree.co.uk / https://freelance.halfacree.co.uk
 # Depends: Various defaults plus task, figlet, fortune, cowsay,
 # gcalcli with oauth configured, and a 'net connection.
@@ -27,6 +27,9 @@ date +"%a %F" | figlet -f small.flf > "$SCHEDULEFILE"
 # Let's start with the weather and cow...
 curl -s wttr.in/$LOCATION?0QT > "$WEATHERFILE"
 /usr/games/fortune -a -s | /usr/games/cowsay -W 30 > "$COWFILE"
+if grep --quiet Sorry "$WEATHERFILE"; then
+    printf "\nWeather service down. :(" > "$WEATHERFILE"
+fi
 paste "$COWFILE" "$WEATHERFILE" | column -s $'\t' -t >> "$SCHEDULEFILE"
 printf "\n" >> "$SCHEDULEFILE"
 
