@@ -39,8 +39,8 @@ task ls >> "$SCHEDULEFILE" || printf "\nNo tasks due!\n" >> "$SCHEDULEFILE"
 printf "\n" >> "$SCHEDULEFILE"
 
 # Calendar...
-echo -n "THIS WEEK'S SCHEDULE" >> "$SCHEDULEFILE"
-gcalcli calw 1 --calendar="Holidays in United Kingdom" $CALENDARS --nocolor --nolineart -w 9 >> "$SCHEDULEFILE"
+echo "THIS WEEK'S SCHEDULE" >> "$SCHEDULEFILE"
+gcalcli --nocolor --lineart ascii --calendar="Holidays in United Kingdom" $CALENDARS calw >> "$SCHEDULEFILE"
 
 # Word of the Day
 echo "WORD OF THE DAY" >> "$SCHEDULEFILE"
