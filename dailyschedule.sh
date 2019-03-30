@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Daily schedule printer! v0.7
+# Daily schedule printer! v0.8
 # gareth@halfacree.co.uk / https://freelance.halfacree.co.uk
 # Depends: Various defaults plus task, figlet, fortune, cowsay,
 # gcalcli with oauth configured, and a 'net connection.
@@ -38,9 +38,9 @@ echo -n "TASKS" >> "$SCHEDULEFILE"
 task ls >> "$SCHEDULEFILE" || printf "\nNo tasks due!\n" >> "$SCHEDULEFILE"
 printf "\n" >> "$SCHEDULEFILE"
 
-# Calendar...
-echo "THIS WEEK'S SCHEDULE" >> "$SCHEDULEFILE"
-gcalcli --nocolor --lineart ascii --calendar="Holidays in United Kingdom" $CALENDARS calw >> "$SCHEDULEFILE"
+# Calendar... - BROKEN IN LATEST GCALCLI OWING TO DEPRECATION OF WIDTHS LESS THAN 10 (the buggers)
+#echo "THIS WEEK'S SCHEDULE" >> "$SCHEDULEFILE"
+#gcalcli --nocolor --lineart ascii --calendar="Holidays in United Kingdom" $CALENDARS calw >> "$SCHEDULEFILE"
 
 # Word of the Day
 echo "WORD OF THE DAY" >> "$SCHEDULEFILE"
