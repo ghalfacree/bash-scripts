@@ -18,4 +18,4 @@ Pi default)"
 esac
 
 #gst-launch-1.0 -v decklinkvideosrc mode=$mode ! videoconvert ! xvimagesink
-gst-launch-1.0 decklinkvideosrc mode=$i ! videoconvert ! xvimagesink decklinkaudiosrc typefind=true do-timestamp=true alignment-threshold=100 ! audioconvert ! autoaudiosink sync=false
+gst-launch-1.0 decklinkvideosrc mode=$mode ! videoconvert ! xvimagesink decklinkaudiosrc typefind=true do-timestamp=true alignment-threshold=100 ! audioconvert ! autoaudiosink sync=false
