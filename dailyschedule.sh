@@ -44,7 +44,7 @@ printf "\n" >> "$SCHEDULEFILE"
 
 # Word of the Day
 echo "WORD OF THE DAY" >> "$SCHEDULEFILE"
-wordoftheday.sh >> "$SCHEDULEFILE"
+./wordoftheday.sh >> "$SCHEDULEFILE"
 
 # Now wrap and print...
 if [ "$1" == "--print" ]; then
