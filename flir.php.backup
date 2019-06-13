@@ -251,10 +251,10 @@ if ( isset($options['stretch']) )
 }
 
 // draw color scale
-exec($convert . ' -size 100x2450 gradient: ' . $pal . ' -clut -mattecolor ' . $font_color . ' -frame 1x1 -set colorspace rgb -mattecolor gray -frame 8x8 "gradient.png"');
+exec($convert . ' -size 16x300 gradient: ' . $pal . ' -clut -mattecolor ' . $font_color . ' -frame 1x1 -set colorspace rgb -mattecolor gray -frame 1x1 "gradient.png"');
 
 // if your imagemagick have no freetype library remove the next line
-exec($convert." gradient.png -background ".$frame_color." ".$font." -fill ".$font_color." -pointsize 75 label:\"$Temp_max C\" +swap -gravity Center -append  label:\"$Temp_min\" -append gradient.png");
+exec($convert." gradient.png -background ".$frame_color." ".$font." -fill ".$font_color." -pointsize 15 label:\"$Temp_max C\" +swap -gravity Center -append  label:\"$Temp_min\" -append gradient.png");
 
 if ( !isset($options['pip']) )
 {    
