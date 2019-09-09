@@ -8,9 +8,15 @@ case "$1" in
 	1080p)
 		echo "Viewing 1080p feed (Mode 10)"
 		mode=10;;
+	1080p5994)
+		echo "Viewing 1080p59.94 feed (Mode 15)"
+		mode=15;;
 	720p)
 		echo "Viewing 720p feed (Mode 19)"
 		mode=19;;
+	720p50)
+		echo "Viewing 720p50 feed (Mode 17)"
+		mode=17;;
 	*)
 	        echo "No modeline found: defaulting to 1080i (Raspberry
 Pi default)"
