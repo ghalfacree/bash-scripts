@@ -5,6 +5,6 @@
 /usr/sbin/pwrstat -test &> /dev/null
 sleep 30
 
-echo UPS self-test completed with result: $(pwrstat -status | grep Result | cut -d' ' -f3-)
+echo UPS self-test completed with result: $(/usr/sbin/pwrstat -status | grep Result | cut -d' ' -f3-)
 
 exit 0
