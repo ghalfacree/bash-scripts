@@ -80,7 +80,7 @@ for i in parallel convert jpgcrush-moz tesseract pdftk; do
 done
 
 echo "Found $(ls -1 *[pPnNgG] | wc -l) PNG file(s)..."
-echo "Trimming, deskewing, and converting to JPEG..."
+echo "Trimming, deskewing, sharpening, and converting to JPEG..."
 parallel --ungroup convert "{}" -density "$DPI"x"$DPI" -units PixelsPerInch -background black -fuzz 75% -deskew 75% -shave 25x25 -unsharp 0 -quality 85% +repage "$TEMPDIR/{.}.jpg" ::: *[pPnNgG]
 cd "$TEMPDIR"
 echo "Losslessly optimising JPEG files..."
