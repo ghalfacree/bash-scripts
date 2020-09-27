@@ -90,7 +90,7 @@ if [[ ! $(ls *[pPnNgG] 2>/dev/null) ]]; then
     exit 1
 fi
 
-for i in parallel convert jpgcrush-moz tesseract pdftk; do
+for i in parallel convert jpgcrush-moz jpegrescan mozjpeg tesseract pdftk; do
     if [[ ! $(which $i) ]]; then
         echo "ERROR: Dependency $i not found, please install and/or add to path."
         exit 1
@@ -108,7 +108,7 @@ echo "Performing OCR..."
 parallel -j8 --ungroup tesseract "{}" "{.}" pdf &> /dev/null ::: "$TEMPDIR"/*jpg
 echo "Creating output PDF..."
 pdftk "$TEMPDIR/"*pdf cat output "$OUTPUT"
-echo "File $OUTPUT written."
+echo File "$OUTPUT" created, size $(du -h "$OUTPUT" | cut -f1).
 echo "Cleaning up..."
 rm -rf "$TEMPDIR"
 echo "Finished!"
