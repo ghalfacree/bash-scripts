@@ -14,10 +14,11 @@
 DPI=300
 OUTPUT="scan.pdf"
 QUALITY=85
+BACKGROUND="white"
 
 TEMPDIR=$(mktemp -d)
 
-while getopts ":r:o:q:h" FLAG; do
+while getopts ":r:o:b:q:h" FLAG; do
     case $FLAG in
         h )
             echo "Script to turn PNGs into a PDF with searchable text"
@@ -25,6 +26,7 @@ while getopts ":r:o:q:h" FLAG; do
             echo "    Usage: scantopdf.sh -r resolution -q quality -o output"
             echo "        -r - Scan resolution in dots per inch (DPI)"
             echo "        -q - JPEG quality in percent"
+            echo "        -b - Page background colour, white or black"
             echo "        -o - Filename for output PDF"
             echo "        -h - This help"
             exit 0
@@ -54,11 +56,27 @@ while getopts ":r:o:q:h" FLAG; do
                 exit 1
             fi
             ;;
-        \? )
+        b )
+            BACKGROUND="$OPTARG"
+            case $BACKGROUND in
+                "white" )
+                    echo "Page background set to white."
+                    ;;
+                "black" )
+                    echo "Page background set to black."
+                    ;;
+                * )
+                    echo "ERROR: -b must be either black or white."
+                    exit 1
+                    ;;
+            esac
+            ;;
+        * )
             echo "ERROR: Flag -$OPTARG not recognised."
             echo "    Usage: scantopdf.sh -r resolution -q quality -o output"
             echo "        -r - Scan resolution in dots per inch (DPI)"
             echo "        -q - JPEG quality in percent"
+            echo "        -b - Page background colour, white or black"
             echo "        -o - Filename for output PDF"
             echo "        -h - This help"
             exit 1
@@ -81,7 +99,7 @@ done
 
 echo "Found $(ls -1 *[pPnNgG] | wc -l) PNG file(s)..."
 echo "Trimming, deskewing, sharpening, and converting to JPEG at $QUALITY% quality..."
-parallel --ungroup convert "{}" -density "$DPI"x"$DPI" -units PixelsPerInch -background black -fuzz 75% -deskew 75% -shave 25x25 -unsharp 0 -quality "$QUALITY"% +repage "$TEMPDIR/{.}.jpg" ::: *[pPnNgG]
+parallel --ungroup convert "{}" -density "$DPI"x"$DPI" -units PixelsPerInch -background "$BACKGROUND" -fuzz 75% -deskew 75% -shave 25x25 -unsharp 0 -quality "$QUALITY"% +repage "$TEMPDIR/{.}.jpg" ::: *[pPnNgG]
 cd "$TEMPDIR"
 echo "Losslessly optimising JPEG files..."
 parallel --ungroup jpgcrush-moz "{}" &> /dev/null ::: "$TEMPDIR"/*jpg
