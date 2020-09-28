@@ -21,8 +21,8 @@ TEMPDIR=$(mktemp -d)
 while getopts ":r:o:b:q:h" FLAG; do
     case $FLAG in
         h )
-            echo "Script to turn PNGs into a PDF with searchable text"
-            echo "<freelance@halfacree.co.uk> / https://gareth.halfacree.co.uk"
+            echo "scantopdf.sh: Script to turn PNGs into a PDF with searchable text"
+            echo "<gareth@halfacree.co.uk> / https://freelance.halfacree.co.uk"
             echo "    Usage: scantopdf.sh -r resolution -q quality -o output"
             echo "        -r - Scan resolution in dots per inch (DPI)"
             echo "        -q - JPEG quality in percent"
