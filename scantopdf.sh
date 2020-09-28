@@ -1,5 +1,5 @@
 #!/bin/bash
-# Scan to PDF, a handy-dandy shell script for convering PNGs to a PDF with
+# Scan to PDF, a handy-dandy shell script for converting PNGs to a PDF with
 # searchable text.
 # Requires:
 #    GNU Parallel
