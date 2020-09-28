@@ -105,7 +105,7 @@ echo "Losslessly optimising JPEG files..."
 parallel --ungroup jpgcrush-moz "{}" &> /dev/null ::: "$TEMPDIR"/*jpg
 cd "$OLDPWD"
 echo "Performing OCR..."
-parallel -j$(expr $(nproc) / 2) --ungroup tesseract "{}" "{.}" pdf &> /dev/null ::: "$TEMPDIR"/*jpg
+parallel -j$(expr $(nproc) / 2) --ungroup OMP_THREAD_LIMIT=1 tesseract "{}" "{.}" pdf &> /dev/null ::: "$TEMPDIR"/*jpg
 echo "Creating output PDF..."
 pdftk "$TEMPDIR/"*pdf cat output "$OUTPUT"
 echo File "$OUTPUT" created, size $(du -h "$OUTPUT" | cut -f1).
