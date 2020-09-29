@@ -91,7 +91,7 @@ while getopts ":robqih" FLAG; do
 done
 shift $((OPTIND -1))
 
-if [[ ! $(ls *[pPnNgG] 2>/dev/null) ]]; then
+if [[ ! $(ls *[pP][nN][gG] 2>/dev/null) ]]; then
     echo "ERROR: No PNG files found in current directory."
     exit 1
 fi
@@ -103,9 +103,9 @@ for i in parallel convert jpgcrush-moz jpegrescan mozjpeg tesseract pdftk; do
     fi
 done
 
-echo "Found $(ls -1 *[pPnNgG] | wc -l) PNG file(s)..."
+echo "Found $(ls -1 *[pP][nN][gG] | wc -l) PNG file(s)..."
 echo "Trimming, deskewing, sharpening, and converting to JPEG at $QUALITY% quality..."
-parallel --ungroup convert -limit thread 1 "{}" -density "$DPI"x"$DPI" -units PixelsPerInch -background "$BACKGROUND" -fuzz 75% -deskew 75% -shave 25x25 -unsharp 0 -quality "$QUALITY"% +repage "$TEMPDIR/{.}.jpg" ::: *[pPnNgG]
+parallel --ungroup convert -limit thread 1 "{}" -density "$DPI"x"$DPI" -units PixelsPerInch -background "$BACKGROUND" -fuzz 75% -deskew 75% -shave 25x25 -unsharp 0 -quality "$QUALITY"% +repage "$TEMPDIR/{.}.jpg" ::: *[pP][nN][gG]
 cd "$TEMPDIR"
 echo "Losslessly optimising JPEG files..."
 parallel --ungroup jpgcrush-moz "{}" &> /dev/null ::: "$TEMPDIR"/*jpg
