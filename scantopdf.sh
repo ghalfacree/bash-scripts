@@ -15,10 +15,11 @@ DPI=300
 OUTPUT="scan.pdf"
 QUALITY=85
 BACKGROUND="white"
+DISABLEINVERSION="-c tessedit_do_invert=0"
 
 TEMPDIR=$(mktemp -d)
 
-while getopts ":r:o:b:q:h" FLAG; do
+while getopts ":robqih" FLAG; do
     case $FLAG in
         h )
             echo "scantopdf.sh: Script to turn PNGs into a PDF with searchable text"
@@ -28,8 +29,12 @@ while getopts ":r:o:b:q:h" FLAG; do
             echo "        -q - JPEG quality in percent"
             echo "        -b - Page background colour, white or black"
             echo "        -o - Filename for output PDF"
+            echo "        -i - Search for inverted text during OCR stage"
             echo "        -h - This help"
             exit 0
+            ;;
+        i )
+            DISABLEINVERSION=""
             ;;
         o )
             OUTPUT="$OPTARG"
@@ -78,6 +83,7 @@ while getopts ":r:o:b:q:h" FLAG; do
             echo "        -q - JPEG quality in percent"
             echo "        -b - Page background colour, white or black"
             echo "        -o - Filename for output PDF"
+            echo "        -i - Search for inverted text during OCR stage"
             echo "        -h - This help"
             exit 1
             ;;
@@ -105,7 +111,7 @@ echo "Losslessly optimising JPEG files..."
 parallel --ungroup jpgcrush-moz "{}" &> /dev/null ::: "$TEMPDIR"/*jpg
 cd "$OLDPWD"
 echo "Performing OCR..."
-parallel --ungroup OMP_THREAD_LIMIT=1 tesseract -c tessedit_do_invert=0 "{}" "{.}" pdf &> /dev/null ::: "$TEMPDIR"/*jpg
+parallel --ungroup OMP_THREAD_LIMIT=1 tesseract $DISABLEINVERSION "{}" "{.}" pdf &> /dev/null ::: "$TEMPDIR"/*jpg
 echo "Creating output PDF..."
 pdftk "$TEMPDIR/"*pdf cat output "$OUTPUT"
 echo File "$OUTPUT" created, size $(du -h "$OUTPUT" | cut -f1).
