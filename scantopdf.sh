@@ -12,6 +12,7 @@
 # https://freelance.halfacree.co.uk
 
 DPI=300
+DPIMANUAL=0
 OUTPUT="scan.pdf"
 QUALITY=85
 BACKGROUND="white"
@@ -39,9 +40,12 @@ while getopts ":r:b:q:o:ih" FLAG; do
             ;;
         o )
             OUTPUT="$OPTARG"
+            echo "Will output to $OUTPUT."
             ;;
         r )
             DPI="$OPTARG"
+            DPIMANUAL=1
+            echo "Using manual resolution of $DPI DPI."
             case $DPI in
                 ''|*[!0-9]*)
                     echo "ERROR: -r must be a positive integer in DPI."
@@ -104,20 +108,31 @@ for i in parallel convert jpgcrush-moz jpegrescan mozjpeg tesseract pdftk; do
     fi
 done
 
-echo "Will output to $OUTPUT."
 echo "Found $(ls -1 *[pP][nN][gG] | wc -l) PNG file(s)..."
+
+if [ ! $DPIMANUAL == 1 ]; then
+    echo "Determining resolution from first PNG file in queue..."
+    DPI=$(identify -format '%x' -units PixelsPerInch "$(ls -1 *[pP][nN][gG] | head -1)")
+    echo "Using $DPI DPI. To override, cancel and run with -r resolution flag."
+fi
+
 echo "Trimming, deskewing, sharpening, and converting to JPEG at $QUALITY% quality..."
 parallel --ungroup convert -limit thread 1 "{}" -density "$DPI"x"$DPI" -units PixelsPerInch -background "$BACKGROUND" -fuzz 75% -deskew 75% -shave 25x25 -unsharp 0 -quality "$QUALITY"% +repage "$TEMPDIR/{.}.jpg" ::: *[pP][nN][gG]
+
 cd "$TEMPDIR"
 echo "Losslessly optimising JPEG files..."
 parallel --ungroup jpgcrush-moz "{}" &> /dev/null ::: "$TEMPDIR"/*jpg
 cd "$OLDPWD"
+
 echo "Performing OCR..."
 parallel --ungroup OMP_THREAD_LIMIT=1 tesseract $DISABLEINVERSION "{}" "{.}" pdf &> /dev/null ::: "$TEMPDIR"/*jpg
+
 echo "Creating output PDF..."
 pdftk "$TEMPDIR/"*pdf cat output "$OUTPUT"
+
 echo File "$OUTPUT" created, size $(du -h "$OUTPUT" | cut -f1).
 echo "Cleaning up..."
 rm -rf "$TEMPDIR"
+
 echo "Finished!"
 exit 0
