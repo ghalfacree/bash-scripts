@@ -131,7 +131,7 @@ pdftk "$TEMPDIR/"*pdf cat output "$OUTPUT"
 echo "    File $OUTPUT created, size $(du -h "$OUTPUT" | cut -f1)."
 
 echo "Cleaning up..."
-rm -rf "$TEMPDIR"
+rm -r "$TEMPDIR"
 
 echo "Finished!"
 exit 0
