@@ -18,10 +18,11 @@ QUALITY=85
 BACKGROUND="white"
 DISABLEINVERSION="-c tessedit_do_invert=0"
 FORCEJPEG=0
+FORCEPNG=0
 
 TEMPDIR=$(mktemp -d)
 
-while getopts ":r:b:q:o:ijh" FLAG; do
+while getopts ":r:b:q:o:ijph" FLAG; do
     case $FLAG in
         h )
             echo "scantopdf.sh: Script to turn PNGs into a PDF with searchable text"
@@ -33,20 +34,25 @@ while getopts ":r:b:q:o:ijh" FLAG; do
             echo "        -o - Filename for output PDF"
             echo "        -i - Search for inverted text during OCR stage"
             echo "        -j - Force JPEG imagery even if input files are grayscale"
+            echo "        -p - Force PNG imagery even if input files are colour"
             echo "        -h - This help"
             exit 0
             ;;
         i )
-            echo "Enabling inverted text support."
+            echo "FLAG -i: Enabling inverted text support."
             DISABLEINVERSION=""
             ;;
         j )
-            echo "Forcing JPEG imagery..."
+            echo "FLAG -j: Forcing JPEG imagery."
             FORCEJPEG=1
+            ;;
+        p )
+            echo "FLAG -p: Forcing PNG imagery."
+            FORCEPNG=1
             ;;
         o )
             OUTPUT="$OPTARG"
-            echo "Will output to $OUTPUT."
+            echo "FLAG -o: Will output to $OUTPUT."
             ;;
         r )
             DPI="$OPTARG"
@@ -57,7 +63,7 @@ while getopts ":r:b:q:o:ijh" FLAG; do
                     exit 1
                     ;;
             esac
-            echo "Using manual resolution of $DPI DPI."
+            echo "FLAG -r: Using manual resolution of $DPI DPI."
             ;;
         q )
             QUALITY="$OPTARG"
@@ -71,6 +77,7 @@ while getopts ":r:b:q:o:ijh" FLAG; do
                 echo "ERROR: -q must be a JPEG quality percentage between 0 and 100."
                 exit 1
             fi
+            echo "FLAG -q: Using manual quality of $QUALITY%."
             ;;
         b )
             BACKGROUND="$OPTARG"
@@ -86,6 +93,7 @@ while getopts ":r:b:q:o:ijh" FLAG; do
                     exit 1
                     ;;
             esac
+            echo "FLAG -b: Using manual background colour of $BACKGROUND."
             ;;
         * )
             echo "ERROR: Flag -$OPTARG not recognised."
@@ -95,6 +103,8 @@ while getopts ":r:b:q:o:ijh" FLAG; do
             echo "        -b - Page background colour, white or black"
             echo "        -o - Filename for output PDF"
             echo "        -i - Search for inverted text during OCR stage"
+            echo "        -j - Force JPEG imagery even if input files are grayscale"
+            echo "        -p - Force PNG imagery even if input files are colour"
             echo "        -h - This help"
             exit 1
             ;;
@@ -114,6 +124,11 @@ for i in parallel convert jpgcrush-moz optipng jpegrescan mozjpeg tesseract pdft
     fi
 done
 
+if [[ $FORCEJPEG == 1 ]] && [[ $FORCEPNG == 1 ]]; then
+    echo "ERROR: Can't force images to both JPEG and PNG format at the same time."
+    exit 1
+fi
+
 echo "Found $(ls -1 *[pP][nN][gG] | wc -l) PNG file(s)..."
 
 if [[ ! $DPIMANUAL == 1 ]]; then
@@ -122,8 +137,8 @@ if [[ ! $DPIMANUAL == 1 ]]; then
     echo "    Using $DPI DPI. To override, cancel and run with -r resolution flag."
 fi
 
-if [[ $(identify -verbose "$(ls -1 *[pP][nN][gG] | head -1)" | grep Type | cut -d":" -f2) == " Grayscale" ]] && [[ "FORCEJPEG" -eq 0 ]]; then
-    echo "    Grayscale scans detected; will not convert to JPEGs."
+if [[ $(identify -verbose "$(ls -1 *[pP][nN][gG] | head -1)" | grep Type | cut -d":" -f2) == " Grayscale" ]] && [[ $FORCEJPEG == 0 ]] || [[ $FORCEPNG == 1 ]]; then
+    echo "    Grayscale scans detected or -p flag used; will not convert to JPEGs."
     echo "Trimming, deskewing, sharpening PNGs..."
     parallel --ungroup convert -limit thread 1 "{}" -density "$DPI"x"$DPI" -units PixelsPerInch -background "$BACKGROUND" -fuzz 75% -deskew 75% -shave 25x25 -unsharp 0 -grayscale Rec709Luminance +repage "$TEMPDIR/{.}.png" ::: *[pP][nN][gG]
     echo "Losslessly optimising PNG files..."
