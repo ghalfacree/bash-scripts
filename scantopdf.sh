@@ -19,6 +19,7 @@ BACKGROUND="white"
 DISABLEINVERSION="-c tessedit_do_invert=0"
 FORCEJPEG=0
 FORCEPNG=0
+GREYSCALECOMMAND=""
 
 TEMPDIR=$(mktemp -d)
 
@@ -137,15 +138,20 @@ if [[ ! $DPIMANUAL == 1 ]]; then
     echo "    Using $DPI DPI. To override, cancel and run with -r resolution flag."
 fi
 
-if [[ $(identify -verbose "$(ls -1 *[pP][nN][gG] | head -1)" | grep Type | cut -d":" -f2) == " Grayscale" ]] && [[ $FORCEJPEG == 0 ]] || [[ $FORCEPNG == 1 ]]; then
+if [[ $(identify -verbose "$(ls -1 *[pP][nN][gG] | head -1)" | grep Type | cut -d":" -f2) == " Grayscale" ]] && [[ $FORCEJPEG == 0 ]]; then
+    echo "    Grayscale scans detected, setting output files to greyscale."
+    GREYSCALECOMMAND="-grayscale Rec709Luma"
+fi
+
+if [[ $FORCEPNG == 1 ]] || [[ ! $GREYSCALECOMMAND == "" ]]; then
     echo "    Grayscale scans detected or -p flag used; will not convert to JPEGs."
     echo "Trimming, deskewing, sharpening PNGs..."
-    parallel --ungroup convert -limit thread 1 "{}" -density "$DPI"x"$DPI" -units PixelsPerInch -background "$BACKGROUND" -fuzz 75% -deskew 75% -shave 25x25 -unsharp 0 -grayscale Rec709Luma +repage "$TEMPDIR/{.}.png" ::: *[pP][nN][gG]
+    parallel --ungroup convert -limit thread 1 "{}" -density "$DPI"x"$DPI" -units PixelsPerInch -background "$BACKGROUND" -fuzz 75% -deskew 75% -shave 25x25 -unsharp 0 $GREYSCALECOMMAND +repage "$TEMPDIR/{.}.png" ::: *[pP][nN][gG]
     echo "Losslessly optimising PNG files..."
     parallel --ungroup optipng "{}" &> /dev/null ::: "$TEMPDIR"/*png
 else
     echo "Trimming, deskewing, sharpening, and converting to JPEG at $QUALITY% quality..."
-    parallel --ungroup convert -limit thread 1 "{}" -density "$DPI"x"$DPI" -units PixelsPerInch -background "$BACKGROUND" -fuzz 75% -deskew 75% -shave 25x25 -unsharp 0 -quality "$QUALITY"% +repage "$TEMPDIR/{.}.jpg" ::: *[pP][nN][gG]
+    parallel --ungroup convert -limit thread 1 "{}" -density "$DPI"x"$DPI" -units PixelsPerInch -background "$BACKGROUND" -fuzz 75% -deskew 75% -shave 25x25 -unsharp 0 -quality "$QUALITY"% $GREYSCALECOMMAND +repage "$TEMPDIR/{.}.jpg" ::: *[pP][nN][gG]
     cd "$TEMPDIR"
     echo "Losslessly optimising JPEG files..."
     parallel --ungroup jpgcrush-moz "{}" &> /dev/null ::: "$TEMPDIR"/*jpg
