@@ -8,7 +8,7 @@
 #        Everything jpgcrush-moz needs: jpegrescan, mozjpeg
 #    tesseract
 #    pdftk
-#    optipng
+#    pngcrush
 # <gareth@halfacree.co.uk>
 # https://freelance.halfacree.co.uk
 
@@ -118,7 +118,7 @@ if [[ ! $(ls *[pP][nN][gG] 2>/dev/null) ]]; then
     exit 1
 fi
 
-for i in parallel convert jpgcrush-moz optipng jpegrescan mozjpeg tesseract pdftk; do
+for i in parallel convert jpgcrush-moz pngcrush jpegrescan mozjpeg tesseract pdftk; do
     if [[ ! $(which $i) ]]; then
         echo "ERROR: Dependency $i not found, please install and/or add to path."
         exit 1
@@ -146,9 +146,11 @@ fi
 if [[ $FORCEPNG == 1 ]] || [[ ! $GREYSCALECOMMAND == "" ]]; then
     echo "    Grayscale scans detected or -p flag used; will not convert to JPEGs."
     echo "Trimming, deskewing, sharpening PNGs..."
-    parallel --ungroup convert -limit thread 1 "{}" -density "$DPI"x"$DPI" -units PixelsPerInch -background "$BACKGROUND" -fuzz 75% -deskew 75% -shave 25x25 -unsharp 0 $GREYSCALECOMMAND +repage "$TEMPDIR/{.}.png" ::: *[pP][nN][gG]
+    mkdir "$TEMPDIR"/unoptimised
+    parallel --ungroup convert -limit thread 1 "{}" -density "$DPI"x"$DPI" -units PixelsPerInch -background "$BACKGROUND" -fuzz 75% -deskew 75% -shave 25x25 -unsharp 0 $GREYSCALECOMMAND +repage "$TEMPDIR/unoptimised/{.}.png" ::: *[pP][nN][gG]
     echo "Losslessly optimising PNG files..."
-    parallel --ungroup optipng "{}" &> /dev/null ::: "$TEMPDIR"/*png
+    parallel --ungroup pngcrush -q "{}" "$TEMPDIR"/"{/}" &> /dev/null ::: "$TEMPDIR"/unoptimised/*png
+    
 else
     echo "Trimming, deskewing, sharpening, and converting to JPEG at $QUALITY% quality..."
     parallel --ungroup convert -limit thread 1 "{}" -density "$DPI"x"$DPI" -units PixelsPerInch -background "$BACKGROUND" -fuzz 75% -deskew 75% -shave 25x25 -unsharp 0 -quality "$QUALITY"% $GREYSCALECOMMAND +repage "$TEMPDIR/{.}.jpg" ::: *[pP][nN][gG]
