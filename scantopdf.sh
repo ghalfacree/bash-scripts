@@ -23,7 +23,7 @@ GREYSCALECOMMAND=""
 
 TEMPDIR=$(mktemp -d)
 
-while getopts ":r:b:q:o:izjph" FLAG; do
+while getopts ":r:b:q:o:izjpgh" FLAG; do
     case $FLAG in
         h )
             echo "scantopdf.sh: Script to turn PNGs into a PDF with searchable text"
@@ -36,6 +36,7 @@ while getopts ":r:b:q:o:izjph" FLAG; do
             echo "        -i - Search for inverted text during OCR stage"
             echo "        -j - Force JPEG imagery even if input files are grayscale"
             echo "        -p - Force PNG imagery even if input files are colour"
+            echo "        -g - Force four-colour greyscale output"
             echo "        -z - Use Zopfli compression for PNG output (slower, smaller files)"
             echo "        -h - This help"
             exit 0
@@ -51,6 +52,10 @@ while getopts ":r:b:q:o:izjph" FLAG; do
         p )
             echo "FLAG -p: Forcing PNG imagery."
             FORCEPNG=1
+            ;;
+        g )
+            echo "FLAG -g: Forcing four-colour greyscale output."
+            GREYSCALE=1
             ;;
         z )
             echo "FLAG -z: Compressing PNGs with Zopfli."
@@ -115,6 +120,7 @@ while getopts ":r:b:q:o:izjph" FLAG; do
             echo "        -i - Search for inverted text during OCR stage"
             echo "        -j - Force JPEG imagery even if input files are grayscale"
             echo "        -p - Force PNG imagery even if input files are colour"
+            echo "        -g - Force four-colour greyscale output"
             echo "        -z - Use Zopfli compression for PNG output (slower, smaller files)"
             echo "        -h - This help"
             exit 1
@@ -148,12 +154,13 @@ if [[ ! $DPIMANUAL == 1 ]]; then
     echo "    Using $DPI DPI. To override, cancel and run with -r resolution flag."
 fi
 
-if [[ $(identify -verbose "$(ls -1 *[pP][nN][gG] | head -1)" | grep Type | cut -d":" -f2) == " Grayscale" ]] && [[ $FORCEJPEG == 0 ]]; then
-    echo "    Grayscale scans detected, setting output files to greyscale."
+if [[ $(identify -verbose "$(ls -1 *[pP][nN][gG] | head -1)" | grep Type | cut -d":" -f2) == " Grayscale" ]] || [[ $GREYSCALE == 1 ]]; then
+    echo "    Grayscale scans detected or -g flag used, setting output files to four-shade greyscale."
     GREYSCALECOMMAND="-colorspace gray -colors 4 -depth 2"
+    GREYSCALE=1
 fi
 
-if [[ $FORCEPNG == 1 ]] || [[ ! $GREYSCALECOMMAND == "" ]]; then
+if [[ $FORCEPNG == 1 ]] || [[ $GREYSCALE == 1 && $FORCEJPEG == 0 ]]; then
     echo "    Grayscale scans detected or -p flag used; will not convert to JPEGs."
     echo "Trimming, deskewing, sharpening PNGs..."
     mkdir "$TEMPDIR"/unoptimised
