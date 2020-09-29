@@ -44,13 +44,13 @@ while getopts ":r:b:q:o:ih" FLAG; do
         r )
             DPI="$OPTARG"
             DPIMANUAL=1
-            echo "Using manual resolution of $DPI DPI."
             case $DPI in
                 ''|*[!0-9]*)
                     echo "ERROR: -r must be a positive integer in DPI."
                     exit 1
                     ;;
             esac
+            echo "Using manual resolution of $DPI DPI."
             ;;
         q )
             QUALITY="$OPTARG"
