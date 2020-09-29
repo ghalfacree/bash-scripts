@@ -111,7 +111,7 @@ done
 echo "Found $(ls -1 *[pP][nN][gG] | wc -l) PNG file(s)..."
 
 if [ ! $DPIMANUAL == 1 ]; then
-    echo "Determining resolution from first PNG file in queue..."
+    echo "Determining resolution from $(ls -1 *[pP][nN][gG] | head -1)..."
     DPI=$(identify -format '%x' -units PixelsPerInch "$(ls -1 *[pP][nN][gG] | head -1)")
     echo "Using $DPI DPI. To override, cancel and run with -r resolution flag."
 fi
