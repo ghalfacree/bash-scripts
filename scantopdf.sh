@@ -140,7 +140,7 @@ fi
 if [[ $(identify -verbose "$(ls -1 *[pP][nN][gG] | head -1)" | grep Type | cut -d":" -f2) == " Grayscale" ]] && [[ $FORCEJPEG == 0 ]] || [[ $FORCEPNG == 1 ]]; then
     echo "    Grayscale scans detected or -p flag used; will not convert to JPEGs."
     echo "Trimming, deskewing, sharpening PNGs..."
-    parallel --ungroup convert -limit thread 1 "{}" -density "$DPI"x"$DPI" -units PixelsPerInch -background "$BACKGROUND" -fuzz 75% -deskew 75% -shave 25x25 -unsharp 0 -grayscale Rec709Luminance +repage "$TEMPDIR/{.}.png" ::: *[pP][nN][gG]
+    parallel --ungroup convert -limit thread 1 "{}" -density "$DPI"x"$DPI" -units PixelsPerInch -background "$BACKGROUND" -fuzz 75% -deskew 75% -shave 25x25 -unsharp 0 -grayscale Rec709Luma +repage "$TEMPDIR/{.}.png" ::: *[pP][nN][gG]
     echo "Losslessly optimising PNG files..."
     parallel --ungroup optipng "{}" &> /dev/null ::: "$TEMPDIR"/*png
 else
