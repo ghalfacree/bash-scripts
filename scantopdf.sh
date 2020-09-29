@@ -11,7 +11,6 @@
 # <gareth@halfacree.co.uk>
 # https://freelance.halfacree.co.uk
 
-DPI=300
 DPIMANUAL=0
 OUTPUT="scan.pdf"
 QUALITY=85
