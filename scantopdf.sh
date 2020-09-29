@@ -19,7 +19,7 @@ DISABLEINVERSION="-c tessedit_do_invert=0"
 
 TEMPDIR=$(mktemp -d)
 
-while getopts ":robqih" FLAG; do
+while getopts ":r:b:q:o:ih" FLAG; do
     case $FLAG in
         h )
             echo "scantopdf.sh: Script to turn PNGs into a PDF with searchable text"
@@ -34,6 +34,7 @@ while getopts ":robqih" FLAG; do
             exit 0
             ;;
         i )
+            echo "Enabling inverted text support."
             DISABLEINVERSION=""
             ;;
         o )
@@ -103,6 +104,7 @@ for i in parallel convert jpgcrush-moz jpegrescan mozjpeg tesseract pdftk; do
     fi
 done
 
+echo "Will output to $OUTPUT."
 echo "Found $(ls -1 *[pP][nN][gG] | wc -l) PNG file(s)..."
 echo "Trimming, deskewing, sharpening, and converting to JPEG at $QUALITY% quality..."
 parallel --ungroup convert -limit thread 1 "{}" -density "$DPI"x"$DPI" -units PixelsPerInch -background "$BACKGROUND" -fuzz 75% -deskew 75% -shave 25x25 -unsharp 0 -quality "$QUALITY"% +repage "$TEMPDIR/{.}.jpg" ::: *[pP][nN][gG]
