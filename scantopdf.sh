@@ -162,9 +162,9 @@ fi
 
 if [[ $FORCEPNG == 1 ]] || [[ $GREYSCALE == 1 && $FORCEJPEG == 0 ]]; then
     echo "    Grayscale scans detected or -p flag used; will not convert to JPEGs."
-    echo "Trimming, deskewing, sharpening PNGs..."
+    echo "Trimming, deskewing, normalising, sharpening PNGs..."
     mkdir "$TEMPDIR"/unoptimised
-    parallel --ungroup convert -limit thread 1 "{}" -density "$DPI"x"$DPI" -units PixelsPerInch -background "$BACKGROUND" -fuzz 75% -deskew 75% -shave 25x25 -unsharp 0 $GREYSCALECOMMAND +repage "$TEMPDIR/unoptimised/{.}.png" ::: *[pP][nN][gG]
+    parallel --ungroup convert -limit thread 1 "{}" -density "$DPI"x"$DPI" -units PixelsPerInch -background "$BACKGROUND" -fuzz 75% -deskew 75% -shave 25x25 -normalize -unsharp 0 $GREYSCALECOMMAND +repage "$TEMPDIR/unoptimised/{.}.png" ::: *[pP][nN][gG]
     if [[ $ZOPFLI == 1 ]]; then
         echo "Compressing PNG files with Zopfli..."
         parallel --ungroup zopflipng "{}" "$TEMPDIR"/"{/}" &> /dev/null ::: "$TEMPDIR"/unoptimised/*png
@@ -174,8 +174,8 @@ if [[ $FORCEPNG == 1 ]] || [[ $GREYSCALE == 1 && $FORCEJPEG == 0 ]]; then
     fi
     
 else
-    echo "Trimming, deskewing, sharpening, and converting to JPEG at $QUALITY% quality..."
-    parallel --ungroup convert -limit thread 1 "{}" -density "$DPI"x"$DPI" -units PixelsPerInch -background "$BACKGROUND" -fuzz 75% -deskew 75% -shave 25x25 -unsharp 0 -quality "$QUALITY"% $GREYSCALECOMMAND +repage "$TEMPDIR/{.}.jpg" ::: *[pP][nN][gG]
+    echo "Trimming, deskewing, normalising, sharpening, and converting to JPEG at $QUALITY% quality..."
+    parallel --ungroup convert -limit thread 1 "{}" -density "$DPI"x"$DPI" -units PixelsPerInch -background "$BACKGROUND" -fuzz 75% -deskew 75% -shave 25x25 -normalize -unsharp 0 -quality "$QUALITY"% $GREYSCALECOMMAND +repage "$TEMPDIR/{.}.jpg" ::: *[pP][nN][gG]
     cd "$TEMPDIR"
     echo "Losslessly optimising JPEG files..."
     parallel --ungroup jpgcrush-moz "{}" &> /dev/null ::: "$TEMPDIR"/*jpg
