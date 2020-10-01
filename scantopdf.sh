@@ -195,7 +195,7 @@ if [[ $IMAGETYPE == " Grayscale" || $GREYSCALE == 1 ]] && [[ ! $BILEVEL == 1 ]];
     GREYSCALECOMMAND="-colorspace gray -colors 4 -depth 2"
     GREYSCALE=1
 elif [[ $IMAGETYPE == " Bilevel" ]] || [[ $BILEVEL == 1 ]]; then
-    echo "    Black and white scans detected, setting output files to 1-bit bilevel."
+    echo "    Black and white scans detected or -l flag used, setting output files to 1-bit bilevel."
     GREYSCALECOMMAND="-colorspace gray -depth 1"
     GREYSCALE=1
 fi
