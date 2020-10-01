@@ -201,7 +201,7 @@ elif [[ $IMAGETYPE == " Bilevel" ]] || [[ $BILEVEL == 1 ]]; then
 fi
 
 if [[ $FORCEPNG == 1 ]] || [[ $GREYSCALE == 1 && $FORCEJPEG == 0 ]]; then
-    echo "    Grayscale scans detected or -p flag used; will not convert to JPEGs."
+    echo "    Grayscale scans detected, -p flag, or -l flag used; will not convert to JPEGs."
     echo "Trimming, deskewing, normalising, sharpening PNGs..."
     mkdir "$TEMPDIR"/unoptimised
     parallel --ungroup convert -limit thread 1 "{}" -density "$DPI"x"$DPI" -units PixelsPerInch -background "$BACKGROUND" -fuzz 75% -deskew 75% -shave 25x25 -normalize -unsharp 0 $GREYSCALECOMMAND +repage "$TEMPDIR/unoptimised/{/.}.png" ::: "$DIRECTORYPREFIX"*[pP][nN][gG]
